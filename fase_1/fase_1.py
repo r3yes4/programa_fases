@@ -22,8 +22,21 @@ if archivos:
     for archivo in archivos:
         # Inicio de la petición API
         mime_type, _ = mimetypes.guess_type(archivo)
+        stat = os.stat(archivo)
+        umbral = 32 * 1024 * 1024
+        if stat.st_size < umbral:
+            url = "https://www.virustotal.com/api/v3/files"
+        else:
+            url = "https://www.virustotal.com/api/v3/files/upload_url"
 
-        url = "https://www.virustotal.com/api/v3/files"
+            headers = {
+                "accept": "application/json",
+                "x-apikey": "890d64820c761129bf48777e0182b612a1acfb590b04045171faff730633d686"
+            }
+
+            response = requests.get(url, headers=headers)
+            data = json.loads(response.text)
+            url = data["data"]
 
         with open(archivo, "rb") as file_data:  # Asegurarse de cerrar el archivo después
             files = { "file": (archivo, file_data, mime_type) }
@@ -39,8 +52,8 @@ if archivos:
                 file_id = data["data"]["id"]
             else:
                 print(f"Error al enviar {archivo}: {response.status_code} - {response.text}")
-
         # Fin de la petición API upload
+
         ### Verificar si tiene virus
         #Inicio peticion API
         url2 = "https://www.virustotal.com/api/v3/analyses/"+file_id
@@ -54,18 +67,15 @@ if archivos:
         
 
         json_data = response.json() 
-        
         #fin api req
 
         # Acceder a los atributos y resultados con json
         attributes = json_data['data']['attributes']
         results = attributes['results']
-
+        virus = False
         for key, value in results.items():
             if value['result'] != None:
                 virus = True
-            else:
-                virus = False
                 
         if virus == True:
             shutil.move(archivo, "archivos/infectados")
