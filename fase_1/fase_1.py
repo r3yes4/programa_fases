@@ -60,10 +60,12 @@ if archivos:
         # Acceder a los atributos y resultados con json
         attributes = json_data['data']['attributes']
         results = attributes['results']
-        virus = False
+
         for key, value in results.items():
             if value['result'] != None:
                 virus = True
+            else:
+                virus = False
                 
         if virus == True:
             shutil.move(archivo, "archivos/infectados")
