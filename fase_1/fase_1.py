@@ -4,6 +4,7 @@ import json
 import mimetypes
 import time
 import shutil
+import hashlib
 
 def obtenerArchivos(directorio):
     archivos_encontrados = [] 
@@ -13,6 +14,13 @@ def obtenerArchivos(directorio):
             archivos_encontrados.append(ruta_completa)  # Agregar la ruta a la lista
     return archivos_encontrados
 
+def calcular_sha256(ruta_archivo):
+    sha256_hash = hashlib.sha256()
+    with open(ruta_archivo, "rb") as archivo:
+        for bloque in iter(lambda: archivo.read(4096), b""):
+            sha256_hash.update(bloque)
+    return sha256_hash.hexdigest()
+
 # Obtener archivos del directorio
 archivos = obtenerArchivos("DirectorioPrincipal")
 
@@ -20,6 +28,17 @@ api_key = "890d64820c761129bf48777e0182b612a1acfb590b04045171faff730633d686"
 
 if archivos:
     for archivo in archivos:
+        file_hash = calcular_sha256(archivo)
+        if os.path.exists("history.json"):
+            with open("history.json", "r") as history:
+                data = json.load(history)
+
+            for item in data["logs"]:
+                if item["hash"] == file_hash:
+                    if item["virus"] == False:
+                        shutil.move(archivo, "archivos/limpios")
+                        exit()
+                    
         # Inicio de la petición API
         mime_type, _ = mimetypes.guess_type(archivo)
         stat = os.stat(archivo)
@@ -37,6 +56,9 @@ if archivos:
             response = requests.get(url, headers=headers)
             data = json.loads(response.text)
             url = data["data"]
+
+
+
 
         with open(archivo, "rb") as file_data:  # Asegurarse de cerrar el archivo después
             files = { "file": (archivo, file_data, mime_type) }
@@ -67,11 +89,12 @@ if archivos:
         
 
         json_data = response.json() 
-        #fin api req
-
-        # Acceder a los atributos y resultados con json
+        #fin api req      
+        
         attributes = json_data['data']['attributes']
         results = attributes['results']
+        file_hash = json_data['meta']['file_info']['sha256']
+
         virus = False
         for key, value in results.items():
             if value['result'] != None:
@@ -81,6 +104,24 @@ if archivos:
             shutil.move(archivo, "archivos/infectados")
         else:
             shutil.move(archivo, "archivos/limpios")
+        log= {
+            'hash' : file_hash,
+            'virus' : virus
+        }  
+
+        if os.path.exists("history.json"):
+            with open("history.json", "r") as history:
+                data = json.load(history)
+        else:
+            data = {"logs": []}
+        for item in data["logs"]:
+            if item["hash"] != log["hash"]:
+                data["logs"].append(log)
+                with open("history.json", "w") as history:
+                    json.dump(data, history, indent=3)
+
+
+        
 
         time.sleep(20)
     
