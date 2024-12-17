@@ -43,6 +43,9 @@ if archivos:
         mime_type, _ = mimetypes.guess_type(archivo)
         stat = os.stat(archivo)
         umbral = 32 * 1024 * 1024
+        umbral2 = 650 * 1024 * 1024
+        if stat.st_size > umbral2:
+            exit()
         if stat.st_size < umbral:
             url = "https://www.virustotal.com/api/v3/files"
         else:
@@ -119,8 +122,6 @@ if archivos:
                 data["logs"].append(log)
                 with open("history.json", "w") as history:
                     json.dump(data, history, indent=3)
-
-
         
 
         time.sleep(20)
