@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    image: php:8.1-apache
+    container_name: apache_php
+    ports:
+      - "8081:80"
+    volumes:
+      - ./html:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=rootp@ssw0rd
+      - MYSQL_DATABASE=bleet
+
+  db:
+    image: mysql:5.7
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootp@ssw0rd
+      MYSQL_DATABASE: bleet
+      MYSQL_USER: usuario
+      MYSQL_PASSWORD: p@ssw0rd
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootp@ssw0rd
+    ports:
+      - "8082:80"
+
+volumes:
+  db_data:
+
