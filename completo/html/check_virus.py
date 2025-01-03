@@ -8,7 +8,7 @@ import hashlib
 
 def obtenerArchivos(directorio):
     archivos_encontrados = []
-    carpetas_a_omitir = {'infectados', 'limpios'}
+    carpetas_a_omitir = {'limpios'}
     
     for root, dirs, files in os.walk(directorio):
         # Omitir carpetas específicas

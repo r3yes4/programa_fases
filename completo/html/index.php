@@ -72,7 +72,7 @@
 							
 							</div>
 							<ul class="actions">
-								<li><a href="generic.html" class="button">Subir archivo</a></li>
+								<li><a href="subir-archivos.php" class="button">Subir archivo</a></li>
 							</ul>
 						</div>
 					</section>

@@ -19,19 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // Verificar el resultado del script de Python
             if ($result === '0') {
-                echo "Archivo subido con éxito: " . $_FILES['file']['name'];
+                header("Location: subir-archivos.php?message=success");
             } elseif ($result === '1') {
-                // Eliminar el archivo si es malicioso
-                
-                echo "El archivo es malicioso y ha sido eliminado.";
+                header("Location: subir-archivos.php?message=virus");
+
             } else {
-                echo "Error al verificar el archivo.";
+                header("Location: subir-archivos.php?message=error_verification");
             }
         } else {
-            echo "Error al mover el archivo.";
+            header("Location: subir-archivos.php?message=move_error");
         }
     } else {
-        echo "Error al subir el archivo.";
+        header("Location: subir-archivos.php?message=upload_error");
     }
+    exit;
 }
 ?>
