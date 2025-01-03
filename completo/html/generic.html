@@ -1,9 +1,3 @@
-<!DOCTYPE HTML>
-<!--
-	Hyperspace by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
 	<head>
 		<title>Generic - Hyperspace by HTML5 UP</title>
@@ -11,53 +5,170 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			.upload-container {
+				background: #4B0082;
+				border: 2px #6c757d;
+				border-radius: 10px;
+				width: 800px;
+				padding: 20px;
+				text-align: center;
+				transition: background-color 0.3s;
+				margin-left: 20%;
+			}
+			
+			.upload-container.dragover {
+				background-color: #e9ecef;
+			}
+			.upload-container h2 {
+				color: white;
+				font-size: 40px;
+			}
+			.upload-container input[type="file"] {
+				display: none;
+			}
+			.upload-btn {
+			display: inline-block;
+			padding: 10px 20px;
+			font-size: 16px;
+			background-color: #a10684;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			margin-top: 10px;
+			text-decoration: none;
+			transition: background-color 0.3s;
+    		}
+			.upload-btn:hover {
+				background-color: #DB91EF;
+			}
+			button, input[type="button"], input[type="submit"] {
+				all: unset;
+				font-weight: bold;
+				display: inline-block;
+				padding: 10px 20px;
+				font-size: 16px;
+				background-color: #a10684;
+				color: white;
+				border-radius: 5px;
+				cursor: pointer;
+				text-align: center;
+				text-decoration: none;
+				transition: background-color 0.3s;
+				margin-left: 10%;
+			}
+			button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+				background-color: #DB91EF;
+			}
+			.file-preview {
+				margin-top: 15px;
+				text-align: left;
+			}
+			.file-preview p {
+				margin: 5px 0;
+				font-size: 14px;
+				color: #ffffff;
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 
 		<!-- Header -->
-			<header id="header">
-				<a href="index.html" class="title">Hyperspace</a>
-				<nav>
-					<ul>
-						<li><a href="index.html">Home</a></li>
-						<li><a href="generic.html" class="active">Generic</a></li>
-						<li><a href="elements.html">Elements</a></li>
-					</ul>
-				</nav>
-			</header>
+		<header id="header">
+			<a href="index.html" class="title">Hyperspace</a>
+			<nav>
+				<ul>
+					<li><a href="index.html">Home</a></li>
+					<li><a href="generic.html" class="active">Generic</a></li>
+					<li><a href="elements.html">Elements</a></li>
+				</ul>
+			</nav>
+		</header>
 
 		<!-- Wrapper -->
-			<div id="wrapper">
+		<div id="wrapper">
 
-				<!-- Main -->
-					<section id="main" class="wrapper">
-						<div class="inner">
-							<h1 class="major">A Generic Page</h1>
-							<span class="image fit"><img src="images/pic04.jpg" alt="" /></span>
-							<p>Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis. Praesent rutrum sem diam, vitae egestas enim auctor sit amet. Pellentesque leo mauris, consectetur id ipsum sit amet, fergiat. Pellentesque in mi eu massa lacinia malesuada et a elit. Donec urna ex, lacinia in purus ac, pretium pulvinar mauris. Curabitur sapien risus, commodo eget turpis at, elementum convallis elit. Pellentesque enim turpis, hendrerit tristique.</p>
-							<p>Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis. Praesent rutrum sem diam, vitae egestas enim auctor sit amet. Pellentesque leo mauris, consectetur id ipsum sit amet, fersapien risus, commodo eget turpis at, elementum convallis elit. Pellentesque enim turpis, hendrerit tristique lorem ipsum dolor.</p>
-						</div>
-					</section>
+			<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<h1 class="major">Subir archivo</h1>
+					<div class="upload-container" id="drop-zone">
+						<h2 class="texto">Arrastra tus archivos aquí o haz clic para seleccionarlos</h2>
+						<form action="upload.php" method="post" enctype="multipart/form-data">
+							<input type="file" name="file" id="file-input" multiple>
+							<label class="upload-btn" id="file-label">Seleccionar archivo</label>
+							<button type="submit">Subir</button>
+						</form>
+						<div class="file-preview" id="file-preview"></div>
+					</div>
+				</div>
+			</section>
 
-			</div>
+			<script>
+				const dropZone = document.getElementById('drop-zone');
+				const fileInput = document.getElementById('file-input');
+				const fileLabel = document.getElementById('file-label');
+				const filePreview = document.getElementById('file-preview');
+
+				// Cambia el estilo al arrastrar archivos
+				dropZone.addEventListener('dragover', (event) => {
+					event.preventDefault();
+					dropZone.classList.add('dragover');
+				});
+
+				dropZone.addEventListener('dragleave', () => {
+					dropZone.classList.remove('dragover');
+				});
+
+				dropZone.addEventListener('drop', (event) => {
+					event.preventDefault();
+					dropZone.classList.remove('dragover');
+
+					// Añade los archivos al input
+					fileInput.files = event.dataTransfer.files;
+					updateFilePreview(event.dataTransfer.files);
+				});
+
+				// Abre el selector de archivos al hacer clic en el label
+				fileLabel.addEventListener('click', () => {
+					fileInput.click();
+				});
+
+				// Muestra la vista previa de los archivos seleccionados
+				fileInput.addEventListener('change', () => {
+					updateFilePreview(fileInput.files);
+				});
+
+				function updateFilePreview(files) {
+					filePreview.innerHTML = '';
+					Array.from(files).forEach(file => {
+						const fileItem = document.createElement('p');
+						fileItem.textContent = `Archivo: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+						filePreview.appendChild(fileItem);
+					});
+				}
+			</script>
+
+		</div>
 
 		<!-- Footer -->
-			<footer id="footer" class="wrapper alt">
-				<div class="inner">
-					<ul class="menu">
-						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-					</ul>
-				</div>
-			</footer>
+		<footer id="footer" class="wrapper alt">
+			<div class="inner">
+				<ul class="menu">
+					<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+				</ul>
+			</div>
+		</footer>
 
 		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/jquery.scrolly.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
 
 	</body>
 </html>
