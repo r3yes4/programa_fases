@@ -1,6 +1,8 @@
 <?php
 require 'db.php';
 
+$result = null; // Variable para almacenar el resultado de la ejecución
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -15,11 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindParam(':password', $hashed_password);
     $stmt->bindParam(':admin', $admin);
 
-    if ($stmt->execute()) {
-        echo "Usuario agregado exitosamente.";
-    } else {
-        echo "Error al agregar el usuario.";
-    }
+    $result = $stmt->execute();
+
+    // Redirigir para evitar doble envío
+    header("Location: agregar-usuario.php?success=" . ($result ? "1" : "0"));
+    exit;
 }
 ?>
 <!DOCTYPE HTML>
@@ -48,11 +50,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <section id="main" class="wrapper">
             <div class="inner">
                 <h1 class="major">Agregar Usuario</h1>
-                <?php if (isset($stmt) && $stmt->execute()): ?>
-                    <p style="color: green;">Usuario agregado exitosamente.</p>
-                <?php elseif (isset($stmt)): ?>
-                    <p style="color: red;">Error al agregar el usuario.</p>
+                <!-- Mostrar mensajes de éxito o error -->
+                <?php if (isset($_GET['success'])): ?>
+                    <?php if ($_GET['success'] == "1"): ?>
+                        <p style="color: green;">✅ Usuario creado exitosamente.</p>
+                    <?php else: ?>
+                        <p style="color: red;">❌ Error al crear el usuario. Por favor, inténtalo de nuevo.</p>
+                    <?php endif; ?>
                 <?php endif; ?>
+                <!-- Formulario de creación de usuario -->
+                <form action="" method="post">
+                    <div class="row gtr-uniform">
+                        <div class="col-6 col-12-xsmall">
+                            <label for="username">Usuario</label>
+                            <input type="text" name="username" id="username" value="" placeholder="Usuario" required />
+                        </div>
+                        <div class="col-6 col-12-xsmall">
+                            <label for="password">Contraseña</label>
+                            <input type="password" name="password" id="password" value="" placeholder="Contraseña" required />
+                        </div>
+                        <div class="col-12">
+                            <label for="admin">Administrador</label>
+                            <select name="admin" id="admin">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <ul class="actions">
+                                <li><input type="submit" value="Agregar Usuario" class="primary" /></li>
+                                <li><input type="reset" value="Limpiar" /></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
                 <a href="control-panel.php" class="button">Volver al Panel de Administración</a>
             </div>
         </section>

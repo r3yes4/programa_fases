@@ -48,7 +48,8 @@
 						</div>
 						<div class="col-12">
 							<ul class="actions">
-								<li><input type="submit" value="Agregar Usuario" class="primary" /></li>
+								<li><input type="submit" value="Agregar Usuario" class="primary" onclick="this.disabled=true; this.form.submit();" />
+								</li>
 								<li><input type="reset" value="Limpiar" /></li>
 							</ul>
 						</div>
