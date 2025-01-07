@@ -1,3 +1,20 @@
+<?php
+session_start();
+
+// Verificar si el usuario está autenticado
+if (!isset($_SESSION['usuario'])) {
+    header("Location: login.php"); // Redirige a la página de inicio de sesión
+    exit;
+}
+
+// Verificar si el usuario es administrador
+if ($_SESSION['is_admin'] != 1) {
+    echo "No tienes permisos para acceder a esta página.";
+    exit;
+}
+
+// Si pasa las verificaciones, muestra el panel
+?>
 <html>
 	<head>
 		<title>Generic - Hyperspace by HTML5 UP</title>
@@ -48,8 +65,7 @@
 						</div>
 						<div class="col-12">
 							<ul class="actions">
-								<li><input type="submit" value="Agregar Usuario" class="primary" onclick="this.disabled=true; this.form.submit();" />
-								</li>
+								<li><input type="submit" value="Agregar Usuario" class="primary" /></li>
 								<li><input type="reset" value="Limpiar" /></li>
 							</ul>
 						</div>
