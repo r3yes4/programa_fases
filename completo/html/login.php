@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Verificar la contraseña
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['usuario'] = $user['usuario'];
+        $_SESSION['is_admin'] = $user['admin'];
         header("Location: control-panel.php");
         exit;
     } else {
