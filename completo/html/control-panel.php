@@ -31,8 +31,8 @@ if ($_SESSION['is_admin'] != 1) {
 			<nav>
 				<ul>
 					<li><a href="index.php">Inicio</a></li>
-					<li><a href="generic.html">Subir archivo</a></li>
-					<li><a href="generic.html" class="active">Panel de administración</a></li>
+					<li><a href="subir-archivos.php">Subir archivo</a></li>
+					<li><a href="control-panel.php" class="active">Panel de administración</a></li>
 					<li><a href="login.php">Iniciar sesión</a></li>
 				</ul>
 			</nav>
