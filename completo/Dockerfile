@@ -4,6 +4,7 @@ FROM php:8.1-apache
 RUN apt-get update && \
     apt-get install -y python3 python3-requests && \
     apt-get clean
+    pip install mysql-connector-python --break-system-packages
 
 
 RUN sed -i 's/;extension=pdo_mysql/extension=pdo_mysql/' /usr/local/etc/php/php.ini-production && \

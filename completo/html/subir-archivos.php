@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+// Verificar si el usuario está autenticado
+if (!isset($_SESSION['usuario'])) {
+    header("Location: login.php"); // Redirige a la página de inicio de sesión
+    exit;
+}
+?>
 <html>
 	<head>
 		<title>Generic - Hyperspace by HTML5 UP</title>
@@ -53,6 +62,7 @@
 			<nav>
 				<ul>
 					<li><a href="index.php">Inicio</a></li>
+					<li><a href="archivos.php" class="active">Mis archivos</a></li>
 					<li><a href="generic.html" class="active">Subir archivo</a></li>
 					<li><a href="login.php">Iniciar sesión</a></li>
 				</ul>
@@ -78,6 +88,15 @@
 					$mensaje = "Error al mover el archivo.";
 				} elseif ($message == 'upload_error') {
 					$mensaje = "Error al subir el archivo.";
+				} elseif ($message == 'no_files') {
+					$mensaje = "No se seleccionaron archivos.";
+				} elseif ($message == 'session_error') {
+					$mensaje = "Error de sesión. Por favor, inicia sesión.";
+				} elseif ($message == 'partial_success') {
+					$mensaje = "Algunos archivos se subieron con éxito, pero otros fallaron.";
+				}
+				  else {
+					$mensaje = "Error desconocido.";
 				}
 			}
 			?> 
@@ -88,11 +107,19 @@
 					<div class="upload-container" id="drop-zone">
 						<h2 class="texto">Arrastra tus archivos aquí o haz clic para seleccionarlos</h2>
 						<form action="upload.php" method="post" enctype="multipart/form-data">
-							<input type="file" name="file" id="file-input" multiple>
-							<label class="button icon solid fa-upload" id="file-label">Seleccionar archivo</label>
-							<button type="submit" class="button">Subir</button>
-						</form>
+						<!-- Botón para seleccionar archivos -->
+						<input type="file" name="file[]" id="file-input" multiple>
+						<label for="file-input" class="button icon solid fa-upload">Seleccionar archivo(s)</label>
+
+						<!-- Botón para seleccionar carpetas -->
+						<input type="file" name="folder[]" id="folder-input" webkitdirectory multiple>
+						<label for="folder-input" class="button icon solid fa-folder">Seleccionar carpeta</label>
+
+						<!-- Área donde se mostrarán los archivos seleccionados -->
 						<div class="file-preview" id="file-preview"></div>
+
+						<button type="submit" class="button">Subir</button>
+						</form>
 					</div>
 					<div class="mensaje">
 						<?php if (isset($mensaje)) { ?>
@@ -102,51 +129,56 @@
 				</div>
 			</section>
 
-			<script>
-				const dropZone = document.getElementById('drop-zone');
-				const fileInput = document.getElementById('file-input');
-				const fileLabel = document.getElementById('file-label');
-				const filePreview = document.getElementById('file-preview');
+		<script>
+			const dropZone = document.getElementById('drop-zone');
+			const fileInput = document.getElementById('file-input');
+			const folderInput = document.getElementById('folder-input');
+			const filePreview = document.getElementById('file-preview');
 
-				// Cambia el estilo al arrastrar archivos
-				dropZone.addEventListener('dragover', (event) => {
-					event.preventDefault();
-					dropZone.classList.add('dragover');
-				});
+			// Cambia el estilo al arrastrar archivos
+			dropZone.addEventListener('dragover', (event) => {
+				event.preventDefault();
+				dropZone.classList.add('dragover');
+			});
 
-				dropZone.addEventListener('dragleave', () => {
-					dropZone.classList.remove('dragover');
-				});
+			dropZone.addEventListener('dragleave', () => {
+				dropZone.classList.remove('dragover');
+			});
 
-				dropZone.addEventListener('drop', (event) => {
-					event.preventDefault();
-					dropZone.classList.remove('dragover');
+			dropZone.addEventListener('drop', (event) => {
+				event.preventDefault();
+				dropZone.classList.remove('dragover');
 
-					// Añade los archivos al input
-					fileInput.files = event.dataTransfer.files;
-					updateFilePreview(event.dataTransfer.files);
-				});
+				// Añadir archivos al input y actualizar vista previa
+				const files = event.dataTransfer.files;
+				fileInput.files = files;
+				updateFilePreview(files);
+			});
 
-				// Abre el selector de archivos al hacer clic en el label
-				fileLabel.addEventListener('click', () => {
-					fileInput.click();
-				});
+			// Muestra la vista previa de los archivos seleccionados
+			fileInput.addEventListener('change', () => updateFilePreview(fileInput.files));
+			folderInput.addEventListener('change', () => updateFilePreview(folderInput.files));
 
-				// Muestra la vista previa de los archivos seleccionados
-				fileInput.addEventListener('change', () => {
-					updateFilePreview(fileInput.files);
-				});
-
-				function updateFilePreview(files) {
-					filePreview.innerHTML = '';
-					Array.from(files).forEach(file => {
-						const fileItem = document.createElement('p');
-						fileItem.textContent = `Archivo: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-						filePreview.appendChild(fileItem);
-					});
+			function updateFilePreview(files) {
+				filePreview.innerHTML = ''; // Limpiar lista previa
+				if (files.length === 0) {
+					filePreview.innerHTML = "<p>No se han seleccionado archivos.</p>";
+					return;
 				}
-			</script>
 
+				const list = document.createElement('ul');
+				list.style.listStyle = "none";
+				list.style.padding = "0";
+
+				Array.from(files).forEach(file => {
+					const listItem = document.createElement('li');
+					listItem.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+					list.appendChild(listItem);
+				});
+
+				filePreview.appendChild(list);
+			}
+		</script>
 		</div>
 
 		<!-- Footer -->

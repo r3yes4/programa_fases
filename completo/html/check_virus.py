@@ -1,138 +1,132 @@
 import os
 import requests
-import json
 import mimetypes
 import time
 import shutil
-import hashlib
+import mysql.connector
 
-def obtenerArchivos(directorio):
-    archivos_encontrados = []
-    carpetas_a_omitir = {'limpios'}
+# Configuración de la base de datos
+DB_CONFIG = {
+    "host": "mysql_db",
+    "user": "root",
+    "password": "rootp@ssw0rd",
+    "database": "bleet"
+}
+
+API_KEY = "890d64820c761129bf48777e0182b612a1acfb590b04045171faff730633d686"
+
+# Conectar a la base de datos y obtener archivos no analizados
+def obtener_archivos_pendientes():
+    conexion = mysql.connector.connect(**DB_CONFIG)
+    cursor = conexion.cursor(dictionary=True)
     
-    for root, dirs, files in os.walk(directorio):
-        # Omitir carpetas específicas
-        dirs[:] = [d for d in dirs if d not in carpetas_a_omitir]
-        
-        for filename in files:
-            ruta_completa = os.path.join(root, filename)  # Construir la ruta completa
-            archivos_encontrados.append(ruta_completa)  # Agregar la ruta a la lista
+    query = "SELECT id, ruta_archivo FROM archivos WHERE analizado = 0"
+    cursor.execute(query)
+    archivos = cursor.fetchall()
     
-    return archivos_encontrados
+    cursor.close()
+    conexion.close()
+    return archivos
 
-def calcular_sha256(ruta_archivo):
-    sha256_hash = hashlib.sha256()
-    with open(ruta_archivo, "rb") as archivo:
-        for bloque in iter(lambda: archivo.read(4096), b""):
-            sha256_hash.update(bloque)
-    return sha256_hash.hexdigest()
+# Actualizar el estado de análisis y la ruta del archivo en la base de datos
+def actualizar_estado_archivo(id_archivo, estado, nueva_ruta=None):
+    conexion = mysql.connector.connect(**DB_CONFIG)
+    cursor = conexion.cursor()
+    
+    if nueva_ruta:
+        query = "UPDATE archivos SET analizado = %s, ruta_archivo = %s WHERE id = %s"
+        cursor.execute(query, (estado, nueva_ruta, id_archivo))
+    else:
+        query = "UPDATE archivos SET analizado = %s WHERE id = %s"
+        cursor.execute(query, (estado, id_archivo))
+    
+    conexion.commit()
+    cursor.close()
+    conexion.close()
 
-# Obtener archivos del directorio
-archivos = obtenerArchivos("uploads")
+while True:
+    time.sleep(5)
+    # Procesar los archivos obtenidos
+    archivos_pendientes = obtener_archivos_pendientes()
 
-api_key = "890d64820c761129bf48777e0182b612a1acfb590b04045171faff730633d686"
+    if archivos_pendientes:
+        for archivo in archivos_pendientes:
+            archivo_id = archivo['id']
+            ruta_archivo = archivo['ruta_archivo']
 
-if archivos:
-    for archivo in archivos:
-        file_hash = calcular_sha256(archivo)
-        if os.path.exists("history.json"):
-            with open("history.json", "r") as history:
-                data = json.load(history)
+            if not os.path.exists(ruta_archivo):
+                print(f"Archivo no encontrado: {ruta_archivo}")
+                continue
+            
+            # Detectar tipo MIME
+            mime_type, _ = mimetypes.guess_type(ruta_archivo)
+            stat = os.stat(ruta_archivo)
+            umbral = 32 * 1024 * 1024  # 32MB
+            umbral2 = 650 * 1024 * 1024  # 650MB
 
-            for item in data["logs"]:
-                if item["hash"] == file_hash:
-                    if item["virus"] == False:
-                        shutil.move(archivo, "archivos/limpios")
-                        exit()
-                    
-        # Inicio de la petición API
-        mime_type, _ = mimetypes.guess_type(archivo)
-        stat = os.stat(archivo)
-        umbral = 32 * 1024 * 1024
-        umbral2 = 650 * 1024 * 1024
-        if stat.st_size > umbral2:
-            exit()
-        if stat.st_size < umbral:
-            url = "https://www.virustotal.com/api/v3/files"
-        else:
-            url = "https://www.virustotal.com/api/v3/files/upload_url"
+            if stat.st_size > umbral2:
+                print(f"El archivo {ruta_archivo} excede el tamaño permitido.")
+                actualizar_estado_archivo(archivo_id, 1)  # Marcar como analizado
+                continue
 
-            headers = {
-                "accept": "application/json",
-                "x-apikey": "890d64820c761129bf48777e0182b612a1acfb590b04045171faff730633d686"
-            }
-
-            response = requests.get(url, headers=headers)
-            data = json.loads(response.text)
-            url = data["data"]
-
-
-
-
-        with open(archivo, "rb") as file_data:  # Asegurarse de cerrar el archivo después
-            files = { "file": (archivo, file_data, mime_type) }
-            headers = {
-                "accept": "application/json",
-                "x-apikey": api_key
-            }
-
-            response = requests.post(url, files=files, headers=headers)
-
-            if response.status_code == 200:
-                data = json.loads(response.text)
-                file_id = data["data"]["id"]
+            if stat.st_size < umbral:
+                url = "https://www.virustotal.com/api/v3/files"
             else:
-                print(f"Error al enviar {archivo}: {response.status_code} - {response.text}")
-        # Fin de la petición API upload
+                url = "https://www.virustotal.com/api/v3/files/upload_url"
+                headers = {"accept": "application/json", "x-apikey": API_KEY}
+                response = requests.get(url, headers=headers)
+                if response.status_code == 200:
+                    data = response.json()
+                    url = data["data"]
+                else:
+                    print(f"Error al obtener URL de subida para {ruta_archivo}")
+                    continue
 
-        ### Verificar si tiene virus
-        #Inicio peticion API
-        url2 = "https://www.virustotal.com/api/v3/analyses/"+file_id
+            with open(ruta_archivo, "rb") as file_data:
+                files = {"file": (ruta_archivo, file_data, mime_type)}
+                headers = {"accept": "application/json", "x-apikey": API_KEY}
+                response = requests.post(url, files=files, headers=headers)
 
-        headers2 = {
-            "accept": "application/json",
-            "x-apikey": api_key
-        }
+                if response.status_code == 200:
+                    data = response.json()
+                    file_id = data["data"]["id"]
+                else:
+                    print(f"Error al enviar {ruta_archivo}: {response.status_code} - {response.text}")
+                    continue
 
-        response = requests.get(url2, headers=headers2)
-        
+            # Esperar antes de verificar el resultado
+            time.sleep(20)
 
-        json_data = response.json() 
-        #fin api req      
-        
-        attributes = json_data['data']['attributes']
-        results = attributes['results']
-        file_hash = json_data['meta']['file_info']['sha256']
+            # Consultar el resultado del análisis
+            url2 = f"https://www.virustotal.com/api/v3/analyses/{file_id}"
+            headers2 = {"accept": "application/json", "x-apikey": API_KEY}
+            response = requests.get(url2, headers=headers2)
 
-        virus = False
-        for key, value in results.items():
-            if value['result'] != None:
-                virus = True
+            if response.status_code != 200:
+                print(f"Error al obtener resultado de {ruta_archivo}")
+                continue
+
+            json_data = response.json()
+            attributes = json_data['data']['attributes']
+            results = attributes['results']
+
+            virus_detectado = any(value['result'] is not None for value in results.values())
+
+            if virus_detectado:
+                os.remove(ruta_archivo)
+                print(f"Archivo infectado eliminado: {ruta_archivo}")
+                actualizar_estado_archivo(archivo_id, 1)  # Marcar como analizado
+            else:
+                destino = "uploads/limpios"
+                os.makedirs(destino, exist_ok=True)
+                nueva_ruta = os.path.join(destino, os.path.basename(ruta_archivo))
                 
-        if virus == True:
-            os.remove(archivo)
-            print("1")
-        else:
-            shutil.move(archivo, "uploads/limpios")
-            print("0")
-        log= {
-            'hash' : file_hash,
-            'virus' : virus
-        }  
+                # Mover el archivo limpio a la carpeta 'limpios'
+                shutil.move(ruta_archivo, nueva_ruta)
+                print(f"Archivo limpio movido: {nueva_ruta}")
 
-        if os.path.exists("history.json"):
-            with open("history.json", "r") as history:
-                data = json.load(history)
-        else:
-            data = {"logs": []}
-        for item in data["logs"]:
-            if item["hash"] != log["hash"]:
-                data["logs"].append(log)
-                with open("history.json", "w") as history:
-                    json.dump(data, history, indent=3)
-        
+                # Actualizar la ruta del archivo en la base de datos
+                actualizar_estado_archivo(archivo_id, 1, nueva_ruta)
 
-        time.sleep(20)
-    
-else:
-    print("No se han encontrado archivos")
+    else:
+        print("No hay archivos pendientes de análisis.")
