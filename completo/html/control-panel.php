@@ -70,6 +70,19 @@ if ($_SESSION['is_admin'] != 1) {
 							</ul>
 						</div>
 					</div>
+					<br></br>
+					<h1 class="major">Crear departamento</h1>
+					<div class="row gtr-uniform">
+						<div class="col-6 col-12-xsmall">
+							<label for="dep_name">Nombre de departamento</label>
+							<input type="text" name="dep_name" id="dep_name" value="" placeholder="Nombre de departamento" required />
+						</div>
+						<div class="col-12">
+							<ul class="actions">
+								<li><input type="submit" value="Agregar Departamento" class="primary" /></li>
+								<li><input type="reset" value="Limpiar" /></li>
+							</ul>
+						</div>
 				</form>
 				</div>
 			</section>

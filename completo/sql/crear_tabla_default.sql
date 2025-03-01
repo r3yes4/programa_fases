@@ -1,9 +1,16 @@
 USE bleet;
 
+CREATE TABLE departamentos (
+    id_departamento INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL  
+);
+
 CREATE TABLE usuarios (
     usuario VARCHAR(50) NOT NULL PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
-    admin TINYINT(1) NOT NULL DEFAULT 0 CHECK (admin IN (0, 1))
+    admin TINYINT(1) NOT NULL DEFAULT 0 CHECK (admin IN (0, 1)),
+    id_departamento INT,
+    FOREIGN KEY (id_departamento) REFERENCES departamentos(id_departamento)
 );
 
 CREATE TABLE archivos (
@@ -27,6 +34,7 @@ CREATE TABLE archivos_compartidos (
     FOREIGN KEY (id_archivo) REFERENCES archivos(id),
     FOREIGN KEY (id_usuario_compartido) REFERENCES usuarios(usuario)
 );
+
 
 INSERT INTO usuarios (usuario, password, admin) 
 VALUES 
