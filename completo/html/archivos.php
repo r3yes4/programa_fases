@@ -49,6 +49,7 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
             background-color: rgba(0, 0, 0, 0.5);
         }
         .modal-content {
+            color: black;
             background-color: #fff;
             margin: 10% auto;
             padding: 20px;
@@ -56,8 +57,12 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
             width: 50%;
             border-radius: 10px;
         }
+        .modal-content h2{
+            color: black;
+            
+        }
         .close {
-            color: #aaa;
+            color: black;
             float: right;
             font-size: 28px;
             font-weight: bold;
@@ -67,10 +72,12 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
             cursor: pointer;
         }
         .user-list {
+            color: black;
             list-style: none;
             padding: 0;
         }
         .user-list li {
+            border-color: black;
             padding: 10px;
             border-bottom: 1px solid #ddd;
             cursor: pointer;
@@ -79,7 +86,7 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
             background-color: #f1f1f1;
         }
 		.container {
-            background-color: rgb(241, 218, 254); /* Celeste */
+            background-color: rgb(241, 218, 254);
             border-radius: 10px;
             width: 100%;
             margin: 0 auto;
@@ -239,14 +246,23 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
 
     <!-- Ventana modal para compartir -->
     <div id="shareModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeShareModal()">&times;</span>
-            <h2>Compartir archivo</h2>
-            <p>Selecciona un usuario para compartir:</p>
-            <ul id="userList" class="user-list">
-                <!-- Aquí se cargará la lista de usuarios -->
-            </ul>
+    <div class="modal-content">
+        <span class="close" onclick="closeShareModal()">&times;</span>
+        <h2>Compartir archivo</h2>
+        <p>Selecciona un usuario o departamento para compartir:</p>
+
+        <!-- Botones para cambiar entre "Usuarios" y "Departamentos" -->
+        <div class="buttons-container">
+            <button id="btnUsers" class="active" onclick="showUsers()">Usuarios</button>
+            <button id="btnDepartments" onclick="showDepartments()">Departamentos</button>
         </div>
+
+        <!-- Lista de usuarios -->
+        <ul id="userList" class="user-list"></ul>
+
+        <!-- Lista de departamentos (inicialmente oculta) -->
+        <ul id="departmentList" class="user-list" style="display: none;"></ul>
+    </div>
     </div>
 
     <!-- Footer -->
@@ -269,61 +285,91 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
 
     <!-- Script para manejar la ventana modal y compartir archivos -->
     <script>
-        // Función para abrir la ventana modal
-        function openShareModal(archivoId) {
-            // Guardar el ID del archivo en una variable global
-            window.currentArchivoId = archivoId;
+    function openShareModal(archivoId) {
+        window.currentArchivoId = archivoId;
+        showUsers(); // Mostrar usuarios por defecto
+        document.getElementById('shareModal').style.display = 'block';
+    }
 
-            // Obtener la lista de usuarios
-            fetch('get_users.php')
-                .then(response => response.json())
-                .then(users => {
-                    const userList = document.getElementById('userList');
-                    userList.innerHTML = ''; // Limpiar la lista
+    function closeShareModal() {
+        document.getElementById('shareModal').style.display = 'none';
+    }
 
-                    // Mostrar cada usuario en la lista
-                    users.forEach(user => {
-                        const li = document.createElement('li');
-                        li.textContent = user.usuario;
-                        li.onclick = () => shareFileWithUser(user.usuario);
-                        userList.appendChild(li);
-                    });
-                });
+    function showUsers() {
+        document.getElementById('userList').style.display = 'block';
+        document.getElementById('departmentList').style.display = 'none';
+        document.getElementById('btnUsers').classList.add('active');
+        document.getElementById('btnDepartments').classList.remove('active');
+        loadUsers();
+    }
 
-            // Mostrar la ventana modal
-            document.getElementById('shareModal').style.display = 'block';
-        }
+    function showDepartments() {
+        document.getElementById('userList').style.display = 'none';
+        document.getElementById('departmentList').style.display = 'block';
+        document.getElementById('btnUsers').classList.remove('active');
+        document.getElementById('btnDepartments').classList.add('active');
+        loadDepartments();
+    }
 
-        // Función para cerrar la ventana modal
-        function closeShareModal() {
-            document.getElementById('shareModal').style.display = 'none';
-        }
-
-        // Función para compartir el archivo con un usuario
-        function shareFileWithUser(usuarioCompartido) {
-            const archivoId = window.currentArchivoId;
-
-            // Enviar una solicitud para compartir el archivo
-            fetch('share_file.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    archivoId: archivoId,
-                    usuarioCompartido: usuarioCompartido
-                })
-            })
+    function loadUsers() {
+        fetch('get_users.php')
             .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Archivo compartido correctamente.');
-                    closeShareModal();
-                } else {
-                    alert('Error al compartir el archivo.');
-                }
+            .then(users => {
+                const userList = document.getElementById('userList');
+                userList.innerHTML = ''; // Limpiar la lista
+                users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.textContent = user.usuario;
+                    li.onclick = () => shareFileWithUser(user.usuario);
+                    userList.appendChild(li);
+                });
             });
-        }
+    }
+
+    function loadDepartments() {
+        fetch('get_departments.php')
+            .then(response => response.json())
+            .then(departments => {
+                const departmentList = document.getElementById('departmentList');
+                departmentList.innerHTML = ''; // Limpiar la lista
+                departments.forEach(department => {
+                    const li = document.createElement('li');
+                    li.textContent = department.nombre;
+                    li.onclick = () => shareFileWithDepartment(department.nombre);
+                    departmentList.appendChild(li);
+                });
+            });
+    }
+
+    function shareFileWithUser(usuarioCompartido) {
+        const archivoId = window.currentArchivoId;
+
+        fetch('share_file.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ archivoId, usuarioCompartido })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.success ? 'Archivo compartido correctamente.' : 'Error al compartir el archivo.');
+            if (data.success) closeShareModal();
+        });
+    }
+
+    function shareFileWithDepartment(departamentoCompartido) {
+        const archivoId = window.currentArchivoId;
+
+        fetch('share_file_department.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ archivoId, departamentoCompartido })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.success ? 'Archivo compartido correctamente.' : 'Error al compartir el archivo.');
+            if (data.success) closeShareModal();
+        });
+    }
     </script>
 </body>
 </html>

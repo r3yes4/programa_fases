@@ -4,6 +4,30 @@ import mimetypes
 import time
 import shutil
 import mysql.connector
+import smtplib
+from email.mime.text import MIMEText
+
+def enviar_correo(mensaje, destinatario):
+    smtp_server = 'smtp.gmail.com'
+    port = 587
+    sender_email = 'poldark3@gmail.com'
+    password = 'qnap ewjt emtk voex'
+
+    message = MIMEText(mensaje)
+    message['From'] = sender_email
+    message['To'] = destinatario
+    message['Subject'] = f'REPORT: Estado de archivo subido a Bleet'
+
+    with smtplib.SMTP(smtp_server, port) as server:
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, destinatario, message.as_string())
+
+
+
+
+destinatario="oscarbarraganreyes4@gmail.com"
+
 
 # Configuración de la base de datos
 DB_CONFIG = {
@@ -116,6 +140,8 @@ while True:
                 os.remove(ruta_archivo)
                 print(f"Archivo infectado eliminado: {ruta_archivo}")
                 actualizar_estado_archivo(archivo_id, 1)  # Marcar como analizado
+                mensaje = f"El archivo {ruta_archivo} ha sido eliminado por contener virus."
+                enviar_correo(mensaje, destinatario)
             else:
                 destino = "uploads/limpios"
                 os.makedirs(destino, exist_ok=True)
@@ -128,5 +154,8 @@ while True:
                 # Actualizar la ruta del archivo en la base de datos
                 actualizar_estado_archivo(archivo_id, 1, nueva_ruta)
 
+                mensaje=f"El archivo {ruta_archivo} ha sido analizado y se ha subido con éxito."
+
+                enviar_correo(mensaje, destinatario)
     else:
         print("No hay archivos pendientes de análisis.")

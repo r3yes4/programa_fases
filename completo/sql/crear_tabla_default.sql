@@ -19,6 +19,7 @@ CREATE TABLE archivos (
     analizado TINYINT(1) NOT NULL DEFAULT 0 CHECK (analizado IN (0, 1)),
     virus TINYINT(1) NOT NULL DEFAULT 0 CHECK (virus IN (0, 1)),
     fecha_subida DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ruta_carpeta VARCHAR(255),
     id_usuario VARCHAR(50) NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(usuario)
 );
