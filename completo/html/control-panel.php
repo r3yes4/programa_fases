@@ -70,6 +70,8 @@ if ($_SESSION['is_admin'] != 1) {
 							</ul>
 						</div>
 					</div>
+				</form>
+				<form>
 					<br></br>
 					<h1 class="major">Crear departamento</h1>
 					<div class="row gtr-uniform">

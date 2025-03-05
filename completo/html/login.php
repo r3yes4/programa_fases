@@ -21,7 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['usuario'] = $user['usuario'];
         $_SESSION['is_admin'] = $user['admin'];
-        header("Location: subir-archivos.php");
+        echo $user['admin'];
+        if ($user ['admin'] == 1) {
+            header("Location: control-panel.php");
+        }else {
+            header("Location: mi_cuenta.php");
+        }
+        
         exit;
     } else {
         $error = "Nombre de usuario o contraseña incorrectos.";
