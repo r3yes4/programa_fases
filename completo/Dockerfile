@@ -14,6 +14,7 @@ RUN apt-get update && \
       unzip && \
     # Instalar el conector de MySQL para Python
     pip install mysql-connector-python --break-system-packages && \
+    pip install pymongo && \
     # Instalar dependencias para PHP
     docker-php-source extract && \
     apt-get install -y libonig-dev && \

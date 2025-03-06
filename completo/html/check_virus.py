@@ -6,6 +6,35 @@ import shutil
 import mysql.connector
 import smtplib
 from email.mime.text import MIMEText
+import pymongo
+import urllib.parse
+
+# Credenciales de MongoDB
+usuario = "mongoadmin"
+password = "mongop@ssw0rd"
+
+# Escapar las credenciales de MongoDB
+usuario_codificado = urllib.parse.quote_plus(usuario)
+password_codificado = urllib.parse.quote_plus(password)
+
+
+def agregar_a_mongo(archivo_id, ruta_archivo):
+        # Conexión a MongoDB
+    usuario="adminmongo"
+    password="mongop@ssw0rd"
+    mongo_client = pymongo.MongoClient(f"mongodb://{usuario_codificado}:{password_codificado}@mongo:27017/")
+    mongo_db = mongo_client["file_uploads"]  # Base de datos 'file_uploads'
+    mongo_collection_infectados = mongo_db["infectados"]  # Colección 'infectados'
+    # Datos que deseas almacenar en la colección 'infectados'
+    archivo_data = {
+        "archivo_id": archivo_id,
+        "ruta_archivo": ruta_archivo,
+        "fecha_detectado": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "estado": "infectado"
+    }
+    # Insertamos el archivo infectado en la colección 'infectados' en MongoDB
+    mongo_collection_infectados.insert_one(archivo_data)
+    print(f"Archivo infectado agregado a MongoDB: {ruta_archivo}")
 
 def enviar_correo(mensaje, destinatario):
     smtp_server = 'smtp.gmail.com'
@@ -65,16 +94,25 @@ def obtener_archivos_pendientes():
     return archivos
 
 # Actualizar el estado de análisis y la ruta del archivo en la base de datos
-def actualizar_estado_archivo(id_archivo, estado, nueva_ruta=None):
+# Actualizar el estado de análisis y la ruta del archivo en la base de datos
+def actualizar_estado_archivo(id_archivo, estado, nueva_ruta=None, virus=None):
     conexion = mysql.connector.connect(**DB_CONFIG)
     cursor = conexion.cursor()
     
     if nueva_ruta:
-        query = "UPDATE archivos SET analizado = %s, ruta_archivo = %s WHERE id = %s"
-        cursor.execute(query, (estado, nueva_ruta, id_archivo))
+        if virus is not None:
+            query = "UPDATE archivos SET analizado = %s, ruta_archivo = %s, virus = %s WHERE id = %s"
+            cursor.execute(query, (estado, nueva_ruta, virus, id_archivo))
+        else:
+            query = "UPDATE archivos SET analizado = %s, ruta_archivo = %s WHERE id = %s"
+            cursor.execute(query, (estado, nueva_ruta, id_archivo))
     else:
-        query = "UPDATE archivos SET analizado = %s WHERE id = %s"
-        cursor.execute(query, (estado, id_archivo))
+        if virus is not None:
+            query = "UPDATE archivos SET analizado = %s, virus = %s WHERE id = %s"
+            cursor.execute(query, (estado, virus, id_archivo))
+        else:
+            query = "UPDATE archivos SET analizado = %s WHERE id = %s"
+            cursor.execute(query, (estado, id_archivo))
     
     conexion.commit()
     cursor.close()
@@ -155,9 +193,10 @@ while True:
             if virus_detectado:
                 os.remove(ruta_archivo)
                 print(f"Archivo infectado eliminado: {ruta_archivo}")
-                actualizar_estado_archivo(archivo_id, 1)  # Marcar como analizado
+                actualizar_estado_archivo(archivo_id, 1, virus=1)  # Marcar como analizado
                 mensaje = f"El archivo {ruta_archivo} ha sido eliminado por contener virus."
                 enviar_correo(mensaje, destinatario)
+                agregar_a_mongo(archivo_id, ruta_archivo)
             else:
                 destino = "uploads/limpios"
                 os.makedirs(destino, exist_ok=True)
