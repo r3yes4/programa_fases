@@ -9,6 +9,8 @@ CREATE TABLE usuarios (
     usuario VARCHAR(50) NOT NULL PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(50) NOT NULL,
+    nombre VARCHAR(100),
+    apellidos VARCHAR(100),
     admin TINYINT(1) NOT NULL DEFAULT 0 CHECK (admin IN (0, 1)),
     id_departamento INT,
     FOREIGN KEY (id_departamento) REFERENCES departamentos(id_departamento)
