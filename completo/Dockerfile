@@ -20,9 +20,7 @@ RUN apt-get update && \
     # Instalar extensiones de PHP necesarias
     docker-php-ext-install pdo pdo_mysql && \
     docker-php-source delete && \
-    # Instalar Composer
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-
+    
     # Limpiar los paquetes temporales para reducir el tamaño de la imagen
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

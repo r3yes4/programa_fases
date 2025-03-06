@@ -23,10 +23,22 @@ def enviar_correo(mensaje, destinatario):
         server.login(sender_email, password)
         server.sendmail(sender_email, destinatario, message.as_string())
 
-
-
-
-destinatario="oscarbarraganreyes4@gmail.com"
+def obtener_correo_usuario(id_usuario):
+    conexion = mysql.connector.connect(**DB_CONFIG)
+    cursor = conexion.cursor(dictionary=True)
+    
+    # Obtener el correo del usuario
+    query = "SELECT email FROM usuarios WHERE usuario = %s"
+    cursor.execute(query, (id_usuario,))
+    usuario = cursor.fetchone()
+    
+    cursor.close()
+    conexion.close()
+    
+    if usuario:
+        return usuario['email']
+    else:
+        return None
 
 
 # Configuración de la base de datos
@@ -44,7 +56,7 @@ def obtener_archivos_pendientes():
     conexion = mysql.connector.connect(**DB_CONFIG)
     cursor = conexion.cursor(dictionary=True)
     
-    query = "SELECT id, ruta_archivo FROM archivos WHERE analizado = 0"
+    query = "SELECT id, ruta_archivo, id_usuario FROM archivos WHERE analizado = 0"
     cursor.execute(query)
     archivos = cursor.fetchall()
     
@@ -77,6 +89,10 @@ while True:
         for archivo in archivos_pendientes:
             archivo_id = archivo['id']
             ruta_archivo = archivo['ruta_archivo']
+            id_usuario = archivo['id_usuario']
+            
+            destinatario = obtener_correo_usuario(id_usuario)
+            
 
             if not os.path.exists(ruta_archivo):
                 print(f"Archivo no encontrado: {ruta_archivo}")
