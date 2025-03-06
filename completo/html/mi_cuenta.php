@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header("Location: login.php");
+    exit();
+}
+$usuario = $_SESSION['usuario']; // Nombre del usuario logueado
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -36,7 +44,6 @@
             font-weight: bold;
             margin-top: 10px;
             color: #fff;
-           
         }
         .sidebar nav ul {
             list-style: none;
@@ -81,7 +88,6 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            text-align: center;
             display: inline-block;
         }
         .btn:hover {
@@ -103,12 +109,12 @@
     <div class="container">
         <div class="sidebar">
             <img src="assets/images/perfil.jpg" alt="Foto de perfil" class="profile-pic">
-            <div class="username">Antonio Pérez</div>
+            <div class="username"><?php echo htmlspecialchars($usuario); ?></div> <!-- Aquí se muestra el nombre -->
             <nav>
                 <ul>
                     <li><a href="#">Cuenta</a></li>
                     <li><a href="#">Cambiar la contraseña</a></li>
-                    <li><a href="#">Privacidad</a></li>
+                    <li><a href="#">Cerrar sesión</a></li>
                     <li><a href="#">Borrar la cuenta</a></li>
                 </ul>
             </nav>
@@ -120,21 +126,21 @@
                     <label>Nombre de usuario</label>
                     <div class="row gtr-uniform">
                         <div class="col-6 col-12-xsmall">
-                            <input type="text" name="usuario" id="usuario" value="" placeholder="Nombre de usuario" />
+                            <input type="text" name="usuario" id="usuario" value="<?php echo htmlspecialchars($usuario); ?>" placeholder="Nombre de usuario" />
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Nombre</label>
-                    <input type="text" value="Antonio">
+                    <input type="text" name="nombre" value="">
                 </div>
                 <div class="form-group">
                     <label>Apellidos</label>
-                    <input type="text" value="Pérez">
+                    <input type="text" name="apellidos" value="">
                 </div>
                 <div class="form-group">
                     <label>Dirección de correo electrónico</label>
-                    <input type="email" value="antonioperez@gmail.com">
+                    <input type="email" name="email" value="">
                 </div>
                 <button type="submit" class="btn">Actualizar la cuenta</button>
             </form>
