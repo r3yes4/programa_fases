@@ -4,6 +4,22 @@ ob_start(); // Iniciar el buffer de salida
 
 // Incluir el archivo de conexión a la base de datos
 require 'db.php';
+require 'vendor/autoload.php'; // Asegúrate de tener el autoload de Composer
+
+// Conexión a MongoDB
+try {
+    $usuario = 'mongoadmin';
+    $contraseña = 'mongop@ssw0rd';
+    $contraseñaCodificada = urlencode($contraseña);
+
+    // Conexión a MongoDB con la contraseña codificada
+    $mongoClient = new MongoDB\Client("mongodb://{$usuario}:{$contraseñaCodificada}@mongo:27017/admin");
+    $mongoDb = $mongoClient->file_uploads; // Reemplaza 'file_uploads' con el nombre de tu base de datos
+    $subidosCollection = $mongoDb->subidos; // Reemplaza 'subidos' con el nombre de tu colección en MongoDB
+} catch (Exception $e) {
+    echo "Error de conexión a MongoDB: " . $e->getMessage() . "<br>";
+    exit;
+}
 
 // Verificar si el usuario está autenticado
 if (!isset($_SESSION['usuario'])) {
@@ -25,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $id_usuario = $_SESSION['usuario'];
         $uploadSuccess = false; // Cambiar a 'false' si *ningún* archivo se subió
-        $atLeastOneSuccess = false; // Nueva variable para rastrear si *algún* archivo se subió
+        $atLeastOneSuccess = false; // Nueva variable para rastrear si *algún* archivo se subió correctamente
 
         // Si hay archivos en la carpeta, fusionarlos con los archivos normales
         if (!empty($_FILES['folder']['name'][0])) {
@@ -55,13 +71,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Mover el archivo a la carpeta de subidas
             if (move_uploaded_file($_FILES['file']['tmp_name'][$i], $uploadFile)) {
                 try {
-                    // Insertar el archivo en la base de datos
-                    // Guardar también la ruta de la carpeta en la base de datos
+                    // Insertar el archivo en la base de datos MySQL
                     $stmt = $conn->prepare("INSERT INTO archivos (ruta_archivo, id_usuario, ruta_carpeta) 
                                             VALUES (:ruta, :id_usuario, :ruta_carpeta)");
                     if ($stmt->execute([':ruta' => $uploadFile, ':id_usuario' => $id_usuario, ':ruta_carpeta' => $relativeFolderPath])) {
                         $uploadSuccess = true;
                         $atLeastOneSuccess = true; // Marcar que al menos un archivo se subió correctamente
+                        
+                        // Insertar el registro en la colección "subidos" de MongoDB
+                        $logData = [
+                            'archivo_nombre' => $name,
+                            'ruta_archivo' => $uploadFile,
+                            'id_usuario' => $id_usuario,
+                            'fecha_subida' => new MongoDB\BSON\UTCDateTime(), // Fecha y hora actual
+                            'ruta_carpeta' => $relativeFolderPath
+                        ];
+
+                        // Insertar en MongoDB
+                        $subidosCollection->insertOne($logData);
                     } else {
                         error_log("Error al insertar en la base de datos.");
                     }
@@ -89,6 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 
 
 

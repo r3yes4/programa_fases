@@ -173,10 +173,11 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
         }
 
         /* Íconos de descarga y compartir */
-        .fa-download, .fa-share{
+        .fa-download, .fa-share .fa-thrash-alt {
             font-size: 15px; /* Ajusta el tamaño del ícono si lo deseas */
 			
         }
+        
     </style>
 </head>
 <body class="is-preload">
@@ -230,6 +231,12 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
                                         <a href="<?php echo $archivo['ruta_archivo']; ?>" download><i class="fas fa-download"></i></a>
                                         <!-- Ícono de compartir -->
                                         <a href="#" onclick="openShareModal(<?php echo $archivo['id']; ?>)"><i class="fas fa-share"></i></a>
+                                    
+                                        
+                                        <a href="#" onclick="confirmDelete(<?php echo $archivo['id']; ?>)">
+                                            <i class="fas fa-trash-alt" style="color:red;"></i>
+                                        </a>
+
                                     </div>
                                 </li>
                             <?php endforeach; ?>
@@ -285,6 +292,11 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
 
     <!-- Script para manejar la ventana modal y compartir archivos -->
     <script>
+    function confirmDelete(archivoId) {
+        if (confirm('¿Estás seguro de que deseas eliminar este archivo?')) {
+            window.location.href = 'eliminar_archivo.php?archivo_id=' + archivoId;
+        }
+    }
     function openShareModal(archivoId) {
         window.currentArchivoId = archivoId;
         showUsers(); // Mostrar usuarios por defecto
