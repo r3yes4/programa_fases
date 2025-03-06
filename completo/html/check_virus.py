@@ -18,7 +18,7 @@ usuario_codificado = urllib.parse.quote_plus(usuario)
 password_codificado = urllib.parse.quote_plus(password)
 
 
-def agregar_a_mongo(archivo_id, ruta_archivo):
+def agregar_a_mongo(archivo_id, ruta_archivo, usuario):
         # Conexión a MongoDB
     usuario="adminmongo"
     password="mongop@ssw0rd"
@@ -29,6 +29,7 @@ def agregar_a_mongo(archivo_id, ruta_archivo):
     archivo_data = {
         "archivo_id": archivo_id,
         "ruta_archivo": ruta_archivo,
+        "usuario": usuario,
         "fecha_detectado": time.strftime("%Y-%m-%d %H:%M:%S"),
         "estado": "infectado"
     }
@@ -196,7 +197,7 @@ while True:
                 actualizar_estado_archivo(archivo_id, 1, virus=1)  # Marcar como analizado
                 mensaje = f"El archivo {ruta_archivo} ha sido eliminado por contener virus."
                 enviar_correo(mensaje, destinatario)
-                agregar_a_mongo(archivo_id, ruta_archivo)
+                agregar_a_mongo(archivo_id, ruta_archivo, id_usuario)
             else:
                 destino = "uploads/limpios"
                 os.makedirs(destino, exist_ok=True)
