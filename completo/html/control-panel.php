@@ -56,6 +56,10 @@ if ($_SESSION['is_admin'] != 1) {
 							<label for="password">Contraseña</label>
 							<input type="password" name="password" id="password" value="" placeholder="Contraseña" required />
 						</div>
+						<div class="col-6 col-12-xsmall">
+                            <label for="email">Correo Electrónico</label>
+                            <input type="email" name="email" id="email" value="" placeholder="Correo Electrónico" required />
+                        </div>
 						<div class="col-12">
 							<label for="admin">Administrador</label>
 							<select name="admin" id="admin">

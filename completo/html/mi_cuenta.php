@@ -1,10 +1,38 @@
 <?php
 session_start();
+require 'db.php';
+
 if (!isset($_SESSION['usuario'])) {
     header("Location: login.php");
-    exit();
+    exit;
 }
-$usuario = $_SESSION['usuario']; // Nombre del usuario logueado
+
+$usuario = $_SESSION['usuario'];
+
+// Obtener los datos del usuario desde la base de datos
+$stmt = $conn->prepare("SELECT nombre, apellidos, email FROM usuarios WHERE usuario = :usuario");
+$stmt->bindParam(':usuario', $usuario);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $nombre = $_POST['nombre'];
+    $apellidos = $_POST['apellidos'];
+    $email = $_POST['email'];
+
+    // Actualizar datos
+    $stmt = $conn->prepare("UPDATE usuarios SET nombre = :nombre, apellidos = :apellidos, email = :email WHERE usuario = :usuario");
+    $stmt->bindParam(':nombre', $nombre);
+    $stmt->bindParam(':apellidos', $apellidos);
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':usuario', $usuario);
+    
+    if ($stmt->execute()) {
+        echo "<p style='color: green;'>Cuenta actualizada correctamente</p>";
+    } else {
+        echo "<p style='color: red;'>Error al actualizar la cuenta</p>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -121,28 +149,28 @@ $usuario = $_SESSION['usuario']; // Nombre del usuario logueado
         </div>
         <div class="content">
             <h2 style="color:#fff;">Cuenta</h2>
-            <form>
+            <form method="POST">
                 <div class="form-group">
                     <label>Nombre de usuario</label>
                     <div class="row gtr-uniform">
                         <div class="col-6 col-12-xsmall">
-                            <input type="text" name="usuario" id="usuario" value="<?php echo htmlspecialchars($usuario); ?>" placeholder="Nombre de usuario" />
+                        <input type="text" value="<?= htmlspecialchars($usuario) ?>" readonly>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Nombre</label>
-                    <input type="text" name="nombre" value="">
+                    <input type="text" name="nombre" value="<?= htmlspecialchars($user['nombre'] ?? '') ?>">
                 </div>
                 <div class="form-group">
                     <label>Apellidos</label>
-                    <input type="text" name="apellidos" value="">
+                    <input type="text" name="apellidos" value="<?= htmlspecialchars($user['apellidos'] ?? '') ?>">
                 </div>
                 <div class="form-group">
                     <label>Dirección de correo electrónico</label>
-                    <input type="email" name="email" value="">
+                    <input type="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>">
                 </div>
-                <button type="submit" class="btn">Actualizar la cuenta</button>
+                <button type="submit">Actualizar cuenta</button>
             </form>
         </div>
     </div>

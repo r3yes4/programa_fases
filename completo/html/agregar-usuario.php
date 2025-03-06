@@ -7,14 +7,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $admin = $_POST['admin'];
+    $email = $_POST['email']; // Obtener el email desde el formulario
 
     // Hashear la contraseña
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Preparar y ejecutar la consulta
-    $stmt = $conn->prepare("INSERT INTO usuarios (usuario, password, admin) VALUES (:usuario, :password, :admin)");
+    $stmt = $conn->prepare("INSERT INTO usuarios (usuario, password, email, admin) VALUES (:usuario, :password, :email, :admin)");
     $stmt->bindParam(':usuario', $username);
     $stmt->bindParam(':password', $hashed_password);
+    $stmt->bindParam(':email', $email); // Vincular el email
     $stmt->bindParam(':admin', $admin);
 
     $result = $stmt->execute();
@@ -68,6 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="col-6 col-12-xsmall">
                             <label for="password">Contraseña</label>
                             <input type="password" name="password" id="password" value="" placeholder="Contraseña" required />
+                        </div>
+                        <div class="col-6 col-12-xsmall">
+                            <label for="email">Correo Electrónico</label>
+                            <input type="email" name="email" id="email" value="" placeholder="Correo Electrónico" required />
                         </div>
                         <div class="col-12">
                             <label for="admin">Administrador</label>
