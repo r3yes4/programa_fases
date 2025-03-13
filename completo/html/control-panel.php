@@ -1,5 +1,6 @@
 <?php
 session_start();
+require 'db.php';
 
 // Verificar si el usuario está autenticado
 if (!isset($_SESSION['usuario'])) {
@@ -12,6 +13,10 @@ if ($_SESSION['is_admin'] != 1) {
     echo "No tienes permisos para acceder a esta página.";
     exit;
 }
+// Obtener los departamentos desde la base de datos
+$stmt = $conn->prepare("SELECT id_departamento, nombre FROM departamentos");
+$stmt->execute();
+$departamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Si pasa las verificaciones, muestra el panel
 ?>
@@ -60,6 +65,15 @@ if ($_SESSION['is_admin'] != 1) {
                             <label for="email">Correo Electrónico</label>
                             <input type="email" name="email" id="email" value="" placeholder="Correo Electrónico" required />
                         </div>
+						<div class="col-6 col-12-xsmall">
+                            <label for="departamento">Departamento</label>
+                            <select name="departamento" id="departamento" required>
+                                <option value="">Selecciona un departamento</option>
+                                <?php foreach ($departamentos as $dep): ?>
+                                    <option value="<?= $dep['id_departamento'] ?>"><?= htmlspecialchars($dep['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 						<div class="col-12">
 							<label for="admin">Administrador</label>
 							<select name="admin" id="admin">
@@ -75,24 +89,23 @@ if ($_SESSION['is_admin'] != 1) {
 						</div>
 					</div>
 				</form>
-				<form>
-					<br></br>
-					<h1 class="major">Crear departamento</h1>
-					<div class="row gtr-uniform">
-						<div class="col-6 col-12-xsmall">
-							<label for="dep_name">Nombre de departamento</label>
-							<input type="text" name="dep_name" id="dep_name" value="" placeholder="Nombre de departamento" required />
-						</div>
-						<div class="col-12">
-							<ul class="actions">
-								<li><input type="submit" value="Agregar Departamento" class="primary" /></li>
-								<li><input type="reset" value="Limpiar" /></li>
-							</ul>
-						</div>
+				<form action="agregar-departamento.php" method="post">
+    				<h1 class="major">Crear departamento</h1>
+    				<div class="row gtr-uniform">
+        				<div class="col-6 col-12-xsmall">
+            				<label for="dep_name">Nombre de departamento</label>
+            				<input type="text" name="dep_name" id="dep_name" value="" placeholder="Nombre de departamento" required />
+        				</div>
+        				<div class="col-12">
+            				<ul class="actions">
+                				<li><input type="submit" value="Agregar Departamento" class="primary" /></li>
+               	 				<li><input type="reset" value="Limpiar" /></li>
+           					</ul>
+        				</div>
+   					 </div>
 				</form>
 				</div>
 			</section>
-
 		</div>
 
 		<!-- Footer -->
