@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
     $admin = $_POST['admin'];
     $email = $_POST['email']; // Obtener el email desde el formulario
+    $departamento = $_POST['departamento'];
 
     // Hashear la contraseña
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -18,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindParam(':password', $hashed_password);
     $stmt->bindParam(':email', $email); // Vincular el email
     $stmt->bindParam(':admin', $admin);
-
+    $stmt->bindParam(':departamento', $departamento, PDO::PARAM_INT);
+    
     $result = $stmt->execute();
 
     // Redirigir para evitar doble envío
