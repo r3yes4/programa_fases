@@ -9,29 +9,38 @@ if (!isset($_SESSION['usuario'])) {
 
 $usuario = $_SESSION['usuario'];
 
-// Obtener los datos del usuario desde la base de datos
-$stmt = $conn->prepare("SELECT nombre, apellidos, email FROM usuarios WHERE usuario = :usuario");
-$stmt->bindParam(':usuario', $usuario);
-$stmt->execute();
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+// Verificar si se ha enviado el formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['actualizar_cuenta'])) {
-        $nombre = $_POST['nombre'];
-        $apellidos = $_POST['apellidos'];
-        $email = $_POST['email'];
-
-        // Actualizar datos
-        $stmt = $conn->prepare("UPDATE usuarios SET nombre = :nombre, apellidos = :apellidos, email = :email WHERE usuario = :usuario");
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':apellidos', $apellidos);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':usuario', $usuario);
+    if (isset($_POST['cambiar_password'])) {
+        $password_actual = $_POST['password_actual'];
+        $nuevo_password = $_POST['nuevo_password'];
+        $confirmar_password = $_POST['confirmar_password'];
         
-        if ($stmt->execute()) {
-            $mensaje = "<p style='color: green;'>Cuenta actualizada correctamente</p>";
+        // Verificar que las contraseñas nuevas coincidan
+        if ($nuevo_password !== $confirmar_password) {
+            $mensaje = "<p style='color: red;'>Las contraseñas nuevas no coinciden</p>";
         } else {
-            $mensaje = "<p style='color: red;'>Error al actualizar la cuenta</p>";
+            // Verificar la contraseña actual
+            $stmt = $conn->prepare("SELECT password FROM usuarios WHERE usuario = :usuario");
+            $stmt->bindParam(':usuario', $usuario);
+            $stmt->execute();
+            $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (password_verify($password_actual, $user_data['password'])) {
+                // Actualizar la contraseña
+                $password_hash = password_hash($nuevo_password, PASSWORD_DEFAULT);
+                $stmt = $conn->prepare("UPDATE usuarios SET password = :password WHERE usuario = :usuario");
+                $stmt->bindParam(':password', $password_hash);
+                $stmt->bindParam(':usuario', $usuario);
+                
+                if ($stmt->execute()) {
+                    $mensaje = "<p style='color: green;'>Contraseña actualizada correctamente</p>";
+                } else {
+                    $mensaje = "<p style='color: red;'>Error al actualizar la contraseña</p>";
+                }
+            } else {
+                $mensaje = "<p style='color: red;'>La contraseña actual es incorrecta</p>";
+            }
         }
     }
 }
@@ -39,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mi Cuenta</title>
+    <title>Cambiar Contraseña</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main.css" />
@@ -151,10 +160,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
             <nav>
                 <ul>
-                    <li class="active">
+                    <li>
                         <a href="mi-cuenta.php">Cuenta</a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="cambiar-password.php">Cambiar la contraseña</a>
                     </li>
                     <li>
@@ -173,25 +182,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             <?php endif; ?>
             
-            <h2 style="color:#fff;">Cuenta</h2>
+            <h2 style="color:#fff;">Cambiar la contraseña</h2>
             <form method="POST">
                 <div class="form-group">
-                    <label>Nombre de usuario</label>
-                    <input type="text" value="<?= htmlspecialchars($usuario) ?>" readonly>
+                    <label>Contraseña actual</label>
+                    <input type="password" name="password_actual" required>
                 </div>
                 <div class="form-group">
-                    <label>Nombre</label>
-                    <input type="text" name="nombre" value="<?= htmlspecialchars($user['nombre'] ?? '') ?>">
+                    <label>Nueva contraseña</label>
+                    <input type="password" name="nuevo_password" required>
                 </div>
                 <div class="form-group">
-                    <label>Apellidos</label>
-                    <input type="text" name="apellidos" value="<?= htmlspecialchars($user['apellidos'] ?? '') ?>">
+                    <label>Confirmar nueva contraseña</label>
+                    <input type="password" name="confirmar_password" required>
                 </div>
-                <div class="form-group">
-                    <label>Dirección de correo electrónico</label>
-                    <input type="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>">
-                </div>
-                <button type="submit" name="actualizar_cuenta">ACTUALIZAR CUENTA</button>
+                <button type="submit" name="cambiar_password">CAMBIAR CONTRASEÑA</button>
             </form>
         </div>
     </div>
