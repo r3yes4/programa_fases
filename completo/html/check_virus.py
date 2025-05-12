@@ -8,6 +8,11 @@ import smtplib
 from email.mime.text import MIMEText
 import pymongo
 import urllib.parse
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
+import os
+from Crypto.Util.Padding import unpad
+import hashlib
 
 # Credenciales de MongoDB
 usuario = "mongoadmin"
@@ -17,6 +22,40 @@ password = "mongop@ssw0rd"
 usuario_codificado = urllib.parse.quote_plus(usuario)
 password_codificado = urllib.parse.quote_plus(password)
 
+#Cifrado AES-256 (32 bytes)
+password = "hola123456789hola"
+
+
+def generate_aes_key(password: str):
+    key = hashlib.sha512(password.encode()).digest()  # SHA-512 genera 64 bytes
+    return key[:32]  # Solo tomamos los primeros 32 bytes
+
+key = generate_aes_key(password)
+
+
+def decrypt_file(input_file, output_file, key):
+    with open(input_file, 'rb') as f:
+        iv = f.read(16)  # Leer el IV del archivo
+        ciphertext = f.read()
+
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
+
+    with open(output_file, 'wb') as f:
+        f.write(plaintext)
+
+
+def encrypt_file(input_file, output_file, key):
+    iv = os.urandom(16)  # Genera un IV aleatorio de 16 bytes
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    
+    with open(input_file, 'rb') as f:
+        plaintext = f.read()
+
+    ciphertext = cipher.encrypt(pad(plaintext, AES.block_size))
+
+    with open(output_file, 'wb') as f:
+        f.write(iv + ciphertext)  # Guardamos el IV al inicio
 
 def agregar_a_mongo(archivo_id, ruta_archivo, usuario):
         # Conexión a MongoDB
@@ -205,10 +244,11 @@ while True:
                 
                 # Mover el archivo limpio a la carpeta 'limpios'
                 shutil.move(ruta_archivo, nueva_ruta)
+                encrypt_file(nueva_ruta, f"{nueva_ruta}.aes", key)
                 print(f"Archivo limpio movido: {nueva_ruta}")
 
                 # Actualizar la ruta del archivo en la base de datos
-                actualizar_estado_archivo(archivo_id, 1, nueva_ruta)
+                actualizar_estado_archivo(archivo_id, 1, f"{nueva_ruta}.aes")
 
                 mensaje=f"El archivo {ruta_archivo} ha sido analizado y se ha subido con éxito."
 

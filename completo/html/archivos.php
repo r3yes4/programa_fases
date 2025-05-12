@@ -217,9 +217,13 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
                         <?php if (count($archivos) > 0): ?>
                             <?php foreach ($archivos as $archivo): ?>
                                 <?php
-                                // Extraer el nombre real del archivo a partir del primer "_"
                                 $fileName = basename($archivo['ruta_archivo']);
                                 $realFileName = substr($fileName, strpos($fileName, '_') + 1);
+
+                                // Eliminar la extensión .aes si está presente
+                                if (str_ends_with($realFileName, '.aes')) {
+                                    $realFileName = substr($realFileName, 0, -4);
+}
                                 ?>
                                 <li>
                                     <!-- Mostrar solo el nombre del archivo como texto -->
@@ -228,7 +232,7 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
                                     <!-- Botones de descarga y compartir -->
                                     <div class="file-actions">
                                         <!-- Ícono de descarga -->
-                                        <a href="<?php echo $archivo['ruta_archivo']; ?>" download><i class="fas fa-download"></i></a>
+                                        <a href="download.php?file=<?php echo urlencode($archivo['ruta_archivo']); ?>"><i class="fas fa-download"></i></a>
                                         <!-- Ícono de compartir -->
                                         <a href="#" onclick="openShareModal(<?php echo $archivo['id']; ?>)"><i class="fas fa-share"></i></a>
                                     
