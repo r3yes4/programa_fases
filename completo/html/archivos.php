@@ -232,7 +232,7 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
                                     <!-- Botones de descarga y compartir -->
                                     <div class="file-actions">
                                         <!-- Ícono de descarga -->
-                                        <a href="download.php?file=<?php echo urlencode($archivo['ruta_archivo']); ?>"><i class="fas fa-download"></i></a>
+                                        <a href="download.php?file=<?php echo urlencode(basename($archivo['ruta_archivo'])); ?>"><i class="fas fa-download"></i></a>
                                         <!-- Ícono de compartir -->
                                         <a href="#" onclick="openShareModal(<?php echo $archivo['id']; ?>)"><i class="fas fa-share"></i></a>
                                     

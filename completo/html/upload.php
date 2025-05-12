@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (move_uploaded_file($_FILES['file']['tmp_name'][$i], $uploadFile)) {
                 try {
                     // Insertar el archivo en la base de datos MySQL
+                    $uploadFile = "../" . $uploadDir . $fileName;
                     $stmt = $conn->prepare("INSERT INTO archivos (ruta_archivo, id_usuario, ruta_carpeta) 
                                             VALUES (:ruta, :id_usuario, :ruta_carpeta)");
                     if ($stmt->execute([':ruta' => $uploadFile, ':id_usuario' => $id_usuario, ':ruta_carpeta' => $relativeFolderPath])) {

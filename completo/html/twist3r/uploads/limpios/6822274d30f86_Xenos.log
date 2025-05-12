@@ -1,0 +1,8 @@
+2025-05-05 22:30:32 *NORMAL*     Started on Windows 10.0.0.26100 x64. Driver status: 0xC0000225
+2025-05-05 22:32:45 *CRITICAL*   Injection initiated. Mode: 0, process type: 0, pid: 12328, mmap flags: 0x0, erasePE: 0, unlink: 0, thread hijack: 0, init routine: '', init arg: ''
+2025-05-05 22:32:45 *CRITICAL*   Injecting image 'C:\Users\polda\Downloads\YimMenuV2.dll'
+2025-05-05 22:56:08 *NORMAL*     Started on Windows 10.0.0.26100 x64. Driver status: 0xC0000225
+2025-05-05 22:56:11 *NORMAL*     Image 'C:\Users\polda\Downloads\YimMenuV2.dll' is already in the list
+2025-05-05 22:56:34 *CRITICAL*   Injection initiated. Mode: 0, process type: 0, pid: 1428, mmap flags: 0x0, erasePE: 0, unlink: 0, thread hijack: 0, init routine: '', init arg: ''
+2025-05-05 22:56:34 *CRITICAL*   Injecting image 'C:\Users\polda\Downloads\YimMenuV2.dll'
+
