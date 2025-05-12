@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <ul>
                     <li><a href="#">Cuenta</a></li>
                     <li><a href="#">Cambiar la contraseña</a></li>
-                    <li><a href="#">Cerrar sesión</a></li>
+                    <li><a href="logout.php">Cerrar sesión</a></li>
                     <li><a href="#">Borrar la cuenta</a></li>
                 </ul>
             </nav>

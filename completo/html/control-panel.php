@@ -94,7 +94,7 @@ $departamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     				<div class="row gtr-uniform">
         				<div class="col-6 col-12-xsmall">
             				<label for="dep_name">Nombre de departamento</label>
-            				<input type="text" name="dep_name" id="dep_name" value="" placeholder="Nombre de departamento" required />
+            				<input type="text" name="dep_name" id="dep_name" value="" placeholder="Nombre de departamento" />
         				</div>
         				<div class="col-12">
             				<ul class="actions">
