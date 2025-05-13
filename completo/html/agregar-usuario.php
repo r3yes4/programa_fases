@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Preparar y ejecutar la consulta
-    $stmt = $conn->prepare("INSERT INTO usuarios (usuario, password, email, admin) VALUES (:usuario, :password, :email, :admin)");
+    $stmt = $conn->prepare("INSERT INTO usuarios (usuario, password, email, admin, id_departamento) VALUES (:usuario, :password, :email, :admin, :departamento)");
     $stmt->bindParam(':usuario', $username);
     $stmt->bindParam(':password', $hashed_password);
     $stmt->bindParam(':email', $email); // Vincular el email

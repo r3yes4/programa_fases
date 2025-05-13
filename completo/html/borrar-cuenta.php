@@ -9,29 +9,32 @@ if (!isset($_SESSION['usuario'])) {
 
 $usuario = $_SESSION['usuario'];
 
-// Obtener los datos del usuario desde la base de datos
-$stmt = $conn->prepare("SELECT nombre, apellidos, email FROM usuarios WHERE usuario = :usuario");
-$stmt->bindParam(':usuario', $usuario);
-$stmt->execute();
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+// Verificar si se ha enviado el formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['actualizar_cuenta'])) {
-        $nombre = $_POST['nombre'];
-        $apellidos = $_POST['apellidos'];
-        $email = $_POST['email'];
-
-        // Actualizar datos
-        $stmt = $conn->prepare("UPDATE usuarios SET nombre = :nombre, apellidos = :apellidos, email = :email WHERE usuario = :usuario");
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':apellidos', $apellidos);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':usuario', $usuario);
+    if (isset($_POST['borrar_cuenta'])) {
+        $password = $_POST['password'];
         
-        if ($stmt->execute()) {
-            $mensaje = "<p style='color: green;'>Cuenta actualizada correctamente</p>";
+        // Verificar la contraseña
+        $stmt = $conn->prepare("SELECT password FROM usuarios WHERE usuario = :usuario");
+        $stmt->bindParam(':usuario', $usuario);
+        $stmt->execute();
+        $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (password_verify($password, $user_data['password'])) {
+            // Borrar la cuenta
+            $stmt = $conn->prepare("DELETE FROM usuarios WHERE usuario = :usuario");
+            $stmt->bindParam(':usuario', $usuario);
+            
+            if ($stmt->execute()) {
+                // Destruir la sesión y redirigir
+                session_destroy();
+                header("Location: login.php?mensaje=cuenta_eliminada");
+                exit;
+            } else {
+                $mensaje = "<p style='color: red;'>Error al eliminar la cuenta</p>";
+            }
         } else {
-            $mensaje = "<p style='color: red;'>Error al actualizar la cuenta</p>";
+            $mensaje = "<p style='color: red;'>Contraseña incorrecta, no se pudo eliminar la cuenta</p>";
         }
     }
 }
@@ -39,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mi Cuenta</title>
+    <title>Borrar Cuenta</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main.css" />
@@ -129,6 +132,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         button:hover {
             background: #4a3685;
         }
+        .delete-button {
+            background-color: #ff3333;
+        }
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
+        .confirmation-box {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
         .mensaje {
             margin-bottom: 15px;
         }
@@ -151,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
             <nav>
                 <ul>
-                    <li class="active">
+                    <li>
                         <a href="mi-cuenta.php">Cuenta</a>
                     </li>
                     <li>
@@ -160,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <li>
                         <a href="logout.php">Cerrar sesión</a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="borrar-cuenta.php">Borrar la cuenta</a>
                     </li>
                 </ul>
@@ -173,26 +189,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             <?php endif; ?>
             
-            <h2 style="color:#fff;">Cuenta</h2>
-            <form method="POST">
-                <div class="form-group">
-                    <label>Nombre de usuario</label>
-                    <input type="text" value="<?= htmlspecialchars($usuario) ?>" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Nombre</label>
-                    <input type="text" name="nombre" value="<?= htmlspecialchars($user['nombre'] ?? '') ?>">
-                </div>
-                <div class="form-group">
-                    <label>Apellidos</label>
-                    <input type="text" name="apellidos" value="<?= htmlspecialchars($user['apellidos'] ?? '') ?>">
-                </div>
-                <div class="form-group">
-                    <label>Dirección de correo electrónico</label>
-                    <input type="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>">
-                </div>
-                <button type="submit" name="actualizar_cuenta">ACTUALIZAR CUENTA</button>
-            </form>
+            <h2 style="color:#fff;">Borrar la cuenta</h2>
+            <p style="color:#fff;">Esta acción no se puede deshacer. Se eliminarán permanentemente todos tus datos.</p>
+            
+            <div class="confirmation-box">
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Introduce tu contraseña para confirmar</label>
+                        <input type="password" name="password" required>
+                    </div>
+                    <button type="submit" name="borrar_cuenta" class="delete-button">BORRAR MI CUENTA</button>
+                </form>
+            </div>
         </div>
     </div>
     <script src="assets/js/main.js"></script>

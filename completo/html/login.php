@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($user ['admin'] == 1) {
             header("Location: control-panel.php");
         }else {
-            header("Location: mi_cuenta.php");
+            header("Location: subir-archivos.php");
         }
         
         exit;
