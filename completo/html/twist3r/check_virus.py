@@ -238,7 +238,7 @@ while True:
                 enviar_correo(mensaje, destinatario)
                 agregar_a_mongo(archivo_id, ruta_archivo, id_usuario)
             else:
-                destino = "uploads/limpios"
+                destino = "../uploads/limpios"
                 os.makedirs(destino, exist_ok=True)
                 nueva_ruta = os.path.join(destino, os.path.basename(ruta_archivo))
                 
