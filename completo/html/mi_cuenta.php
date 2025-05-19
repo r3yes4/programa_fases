@@ -140,19 +140,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <nav>
             <ul>
                 <li><a href="index.php">Inicio</a></li>
+                <li><a href="archivos.php">Mis Archivos</a></li>
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
-                <li><a href="mi-cuenta.php" class="active">Mi Cuenta</a></li>
+                <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
             </ul>
         </nav>
     </header>
     <div class="container">
         <div class="sidebar">
-            <img src="assets/images/perfil.jpg" alt="Foto de perfil" class="profile-pic">
             <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
             <nav>
                 <ul>
                     <li class="active">
-                        <a href="mi-cuenta.php">Cuenta</a>
+                        <a href="mi_cuenta.php">Cuenta</a>
                     </li>
                     <li>
                         <a href="cambiar-password.php">Cambiar la contraseña</a>
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <a href="logout.php">Cerrar sesión</a>
                     </li>
                     <li>
-                        <a href="borrar-cuenta.php">Borrar la cuenta</a>
+                        <a href="borrar_cuenta.php">Borrar la cuenta</a>
                     </li>
                 </ul>
             </nav>

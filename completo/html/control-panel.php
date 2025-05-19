@@ -38,7 +38,7 @@ $departamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					<li><a href="index.php">Inicio</a></li>
 					<li><a href="subir-archivos.php">Subir archivo</a></li>
 					<li><a href="control-panel.php" class="active">Panel de administración</a></li>
-					<li><a href="login.php">Iniciar sesión</a></li>
+					<li><a href="mi_cuenta.php">Mi cuenta</a></li>
 				</ul>
 			</nav>
 		</header>
