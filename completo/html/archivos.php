@@ -9,22 +9,41 @@ if (!isset($_SESSION['usuario'])) {
 }
 
 $id_usuario = $_SESSION['usuario']; // Obtener el id del usuario desde la sesión
+// Conexion mongodb
 
+require 'vendor/autoload.php'; // Requerido para MongoDB
+$usuario = 'mongoadmin';
+$contraseña = 'mongop@ssw0rd';
+$contraseñaCodificada = urlencode($contraseña);
+// Conexión a MongoDB con la contraseña codificada
+$mongoClient = new MongoDB\Client("mongodb://{$usuario}:{$contraseñaCodificada}@mongo:27017/admin");
+
+$mongoDB = $mongoClient->file_uploads;
 // Determinar qué archivo mostrar dependiendo de la selección
 $view = isset($_GET['view']) ? $_GET['view'] : 'mis_archivos'; // Valor por defecto: 'mis_archivos'
 
 // Obtener los archivos que están analizados (analizado = 1) del usuario dependiendo de la vista seleccionada
 if ($view == 'mis_archivos') {
-    // Archivos que el usuario ha subido
     $stmt = $conn->prepare("SELECT * FROM archivos WHERE id_usuario = :id_usuario AND analizado = 1");
-} else {
-    // Archivos compartidos con el usuario
+    $stmt->execute([':id_usuario' => $id_usuario]);
+    $archivos = $stmt->fetchAll();
+} elseif ($view == 'compartidos') {
     $stmt = $conn->prepare("SELECT a.* FROM archivos a
                             JOIN archivos_compartidos ac ON a.id = ac.id_archivo
                             WHERE ac.id_usuario_compartido = :id_usuario AND a.analizado = 1");
+    $stmt->execute([':id_usuario' => $id_usuario]);
+    $archivos = $stmt->fetchAll();
+} elseif ($view == 'resumen') {
+    // Obtener datos desde MongoDB
+    $subidos = $mongoDB->subidos->find(['id_usuario' => $id_usuario])->toArray();
+    $eliminados = $mongoDB->eliminados->find(['usuario_id' => $id_usuario])->toArray();
+    $infectados = $mongoDB->infectados->find(['id_usuario' => $id_usuario])->toArray();
+    $archivos = []; // <-- Vacío o lo que se deba mostrar en resumen
+} else {
+    // Si la vista no es válida, redirigir a 'mis_archivos'
+    header("Location: archivos.php?view=mis_archivos");
+    exit;
 }
-$stmt->execute([':id_usuario' => $id_usuario]);
-$archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
 ?>
 <html>
 <head>
@@ -210,37 +229,76 @@ $archivos = $stmt->fetchAll(); // Obtener los archivos según la vista
                     <div class="buttons-container">
                         <a href="archivos.php?view=mis_archivos" class="button <?php echo ($view == 'mis_archivos') ? 'active' : ''; ?>">Mis archivos</a>
                         <a href="archivos.php?view=compartidos" class="button <?php echo ($view == 'compartidos') ? 'active' : ''; ?>">Compartidos</a>
+                        <a href="archivos.php?view=resumen" class="button <?php echo ($view == 'resumen') ? 'active' : ''; ?>">Resumen</a>
+
                     </div>
 
                     <!-- Lista de archivos -->
                     <ul class="file-list">
-                        <?php if (count($archivos) > 0): ?>
+                        <?php if ($view == 'resumen'): ?>
+                            <?php foreach ($subidos as $archivo): ?>
+                                <?php
+                                $fileName = basename($archivo['ruta_archivo']);
+                                $realFileName = substr($fileName, strpos($fileName, '_') + 1);
+                                if (str_ends_with($realFileName, '.aes')) {
+                                    $realFileName = substr($realFileName, 0, -4);
+                                }
+                                ?>
+                                <li>
+                                    <span><?php echo $realFileName; ?> (Subido)</span>
+                                    <div class="file-actions">
+                                        <a href="#"><i class="fas fa-file-upload"></i></a>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+
+                            <?php foreach ($eliminados as $archivo): ?>
+                                <?php
+                                $fileName = basename($archivo['ruta_archivo']);
+                                $realFileName = substr($fileName, strpos($fileName, '_') + 1);
+                                if (str_ends_with($realFileName, '.aes')) {
+                                    $realFileName = substr($realFileName, 0, -4);
+                                }
+                                ?>
+                                <li>
+                                    <span><?php echo $realFileName; ?> (Eliminado)</span>
+                                    <div class="file-actions">
+                                        <i class="fas fa-trash-alt" style="color: red;"></i>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+
+                            <?php foreach ($infectados as $archivo): ?>
+                                <?php
+                                $fileName = basename($archivo['ruta_archivo']);
+                                $realFileName = substr($fileName, strpos($fileName, '_') + 1);
+                                if (str_ends_with($realFileName, '.aes')) {
+                                    $realFileName = substr($realFileName, 0, -4);
+                                }
+                                ?>
+                                <li>
+                                    <span><?php echo $realFileName; ?> (Infectado)</span>
+                                    <div class="file-actions">
+                                        <i class="fas fa-bug" style="color: darkred;"></i>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+
+                        <?php elseif (count($archivos) > 0): ?>
                             <?php foreach ($archivos as $archivo): ?>
                                 <?php
                                 $fileName = basename($archivo['ruta_archivo']);
                                 $realFileName = substr($fileName, strpos($fileName, '_') + 1);
-
-                                // Eliminar la extensión .aes si está presente
                                 if (str_ends_with($realFileName, '.aes')) {
                                     $realFileName = substr($realFileName, 0, -4);
-}
+                                }
                                 ?>
                                 <li>
-                                    <!-- Mostrar solo el nombre del archivo como texto -->
                                     <span><?php echo $realFileName; ?></span>
-                                    
-                                    <!-- Botones de descarga y compartir -->
                                     <div class="file-actions">
-                                        <!-- Ícono de descarga -->
                                         <a href="download.php?file=<?php echo urlencode(basename($archivo['ruta_archivo'])); ?>"><i class="fas fa-download"></i></a>
-                                        <!-- Ícono de compartir -->
                                         <a href="#" onclick="openShareModal(<?php echo $archivo['id']; ?>)"><i class="fas fa-share"></i></a>
-                                    
-                                        
-                                        <a href="#" onclick="confirmDelete(<?php echo $archivo['id']; ?>)">
-                                            <i class="fas fa-trash-alt" style="color:red;"></i>
-                                        </a>
-
+                                        <a href="#" onclick="confirmDelete(<?php echo $archivo['id']; ?>)"><i class="fas fa-trash-alt" style="color:red;"></i></a>
                                     </div>
                                 </li>
                             <?php endforeach; ?>
