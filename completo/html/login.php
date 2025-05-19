@@ -1,8 +1,12 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 session_start();
+
+// Verificar si el usuario está autenticado
+if (isset($_SESSION['usuario'])) {
+    header("Location: mi_cuenta.php");
+    exit;
+}
+
 require 'db.php';
 
 $error = '';
@@ -11,28 +15,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $usuario = $_POST['usuario'];
     $password = $_POST['password'];
 
-    // Preparar y ejecutar la consulta
     $stmt = $conn->prepare("SELECT * FROM usuarios WHERE usuario = :usuario");
     $stmt->bindParam(':usuario', $usuario);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Verificar la contraseña
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['usuario'] = $user['usuario'];
         $_SESSION['is_admin'] = $user['admin'];
-        echo $user['admin'];
-        if ($user ['admin'] == 1) {
+        if ($user['admin'] == 1) {
             header("Location: control-panel.php");
-        }else {
+        } else {
             header("Location: subir-archivos.php");
         }
-        
         exit;
     } else {
         $error = "Nombre de usuario o contraseña incorrectos.";
     }
 }
+
+// Verificar si viene del intento de subir archivo sin sesión
+$showAlert = isset($_GET['from_upload']) && $_GET['from_upload'] == 'true';
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -42,6 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main.css" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <script>
+        <?php if ($showAlert): ?>
+        window.onload = function() {
+            alert("Debes iniciar sesión para poder subir y compartir archivos.");
+        };
+        <?php endif; ?>
+    </script>
 </head>
 <body class="is-preload">
 
@@ -51,7 +61,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <nav>
         <ul>
             <li><a href="index.php">Inicio</a></li>
-            <li><a href="subir-archivos.php">Subir archivo</a></li>
+            <li>
+                <?php if(isset($_SESSION['usuario'])): ?>
+                    <a href="subir-archivos.php">Subir archivo</a>
+                <?php else: ?>
+                    <a href="#" onclick="alert('Para hacer esto inicie sesión'); return false;">Subir archivo</a>
+                <?php endif; ?>
+            </li>
             <li><a href="login.php" class="active">Iniciar sesión</a></li>
         </ul>
     </nav>
