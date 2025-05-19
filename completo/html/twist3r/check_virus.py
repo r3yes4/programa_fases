@@ -58,9 +58,6 @@ def encrypt_file(input_file, output_file, key):
         f.write(iv + ciphertext)  # Guardamos el IV al inicio
 
 def agregar_a_mongo(archivo_id, ruta_archivo, usuario):
-        # Conexión a MongoDB
-    usuario="adminmongo"
-    password="mongop@ssw0rd"
     mongo_client = pymongo.MongoClient(f"mongodb://{usuario_codificado}:{password_codificado}@mongo:27017/")
     mongo_db = mongo_client["file_uploads"]  # Base de datos 'file_uploads'
     mongo_collection_infectados = mongo_db["infectados"]  # Colección 'infectados'
@@ -68,13 +65,13 @@ def agregar_a_mongo(archivo_id, ruta_archivo, usuario):
     archivo_data = {
         "archivo_id": archivo_id,
         "ruta_archivo": ruta_archivo,
-        "usuario": usuario,
+        "id_usuario": usuario,
         "fecha_detectado": time.strftime("%Y-%m-%d %H:%M:%S"),
         "estado": "infectado"
     }
     # Insertamos el archivo infectado en la colección 'infectados' en MongoDB
     mongo_collection_infectados.insert_one(archivo_data)
-    print(f"Archivo infectado agregado a MongoDB: {ruta_archivo}")
+    
 
 def enviar_correo(mensaje, destinatario):
     smtp_server = 'smtp.gmail.com'
