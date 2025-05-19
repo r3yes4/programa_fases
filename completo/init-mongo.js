@@ -11,7 +11,7 @@ db.subidos.insertOne({
   timestamp: new Date()
 });
 
-print("✅ Base de datos y colecciones creadas correctamente");
+print("Base de datos y colecciones creadas correctamente");
 
 
 
