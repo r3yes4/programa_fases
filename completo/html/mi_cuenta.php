@@ -10,10 +10,11 @@ if (!isset($_SESSION['usuario'])) {
 $usuario = $_SESSION['usuario'];
 
 // Obtener los datos del usuario desde la base de datos
-$stmt = $conn->prepare("SELECT nombre, apellidos, email FROM usuarios WHERE usuario = :usuario");
+$stmt = $conn->prepare("SELECT nombre, apellidos, email, admin FROM usuarios WHERE usuario = :usuario");
 $stmt->bindParam(':usuario', $usuario);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
+$_SESSION['is_admin'] = isset($user['admin']) && $user['admin'] == 1 ? 1 : 0;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['actualizar_cuenta'])) {
@@ -142,6 +143,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <li><a href="index.php">Inicio</a></li>
                 <li><a href="archivos.php">Mis Archivos</a></li>
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
+                <?php if ($_SESSION['is_admin'] == 1): ?>
+                    <li>
+                        <a href="control-panel.php">Control Panel</a>
+                    </li>
+                <?php endif; ?>
                 <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
             </ul>
         </nav>
@@ -163,6 +169,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <li>
                         <a href="borrar_cuenta.php">Borrar la cuenta</a>
                     </li>
+                    <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
+                    <li>
+                        <a href="control-panel.php">Control Panel</a>
+                    </li>
+                    <?php endif; ?>
                 </ul>
             </nav>
         </div>
@@ -172,7 +183,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <?php echo $mensaje; ?>
                 </div>
             <?php endif; ?>
-            
             <h2 style="color:#fff;">Cuenta</h2>
             <form method="POST">
                 <div class="form-group">
