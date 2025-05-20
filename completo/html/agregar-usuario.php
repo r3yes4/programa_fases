@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $departamento = $_POST['departamento'];
 
     // Hashear la contraseña
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $hashed_password = hash('sha256', $password);
 
     // Preparar y ejecutar la consulta
     $stmt = $conn->prepare("INSERT INTO usuarios (usuario, password, email, admin, id_departamento) VALUES (:usuario, :password, :email, :admin, :departamento)");

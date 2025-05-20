@@ -20,7 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password, $user['password'])) {
+    if ($user && hash_equals($password, $user['password'])) {
+
         $_SESSION['usuario'] = $user['usuario'];
         $_SESSION['is_admin'] = $user['admin'];
         if ($user['admin'] == 1) {
@@ -40,6 +41,7 @@ $showAlert = isset($_GET['from_upload']) && $_GET['from_upload'] == 'true';
 <!DOCTYPE HTML>
 <html>
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
     <title>Login</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
@@ -52,6 +54,7 @@ $showAlert = isset($_GET['from_upload']) && $_GET['from_upload'] == 'true';
         };
         <?php endif; ?>
     </script>
+
     <style>
         /* Estilo para el alert de error */
         .error {
@@ -145,7 +148,7 @@ $showAlert = isset($_GET['from_upload']) && $_GET['from_upload'] == 'true';
                 <?php if (!empty($error)): ?>
                     <p style="color: red;"><?php echo $error; ?></p>
                 <?php endif; ?>
-                <form method="post" action="">
+                <form method="post" action="" id="loginForm">
                     <div class="row gtr-uniform">
                         <div class="col-6 col-12-xsmall">
                             <input type="text" name="usuario" id="usuario" value="" placeholder="Nombre de usuario" />
@@ -163,6 +166,8 @@ $showAlert = isset($_GET['from_upload']) && $_GET['from_upload'] == 'true';
             </section>
         </div>
     </section>
+    
+    </div>
     <script>
         function showLoginAlert() {
             // Crear el elemento del alert
@@ -189,6 +194,26 @@ $showAlert = isset($_GET['from_upload']) && $_GET['from_upload'] == 'true';
             }, 3500);
         }
     </script>
-</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("loginForm");
+        const passwordInput = document.getElementById("password");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const encoder = new TextEncoder();
+            const data = encoder.encode(passwordInput.value);
+            const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            passwordInput.value = hashHex;
+            form.submit();
+        });
+    });
+    </script>
 </body>
 </html>

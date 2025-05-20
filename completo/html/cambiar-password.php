@@ -9,30 +9,31 @@ if (!isset($_SESSION['usuario'])) {
 
 $usuario = $_SESSION['usuario'];
 
-// Verificar si se ha enviado el formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['cambiar_password'])) {
         $password_actual = $_POST['password_actual'];
         $nuevo_password = $_POST['nuevo_password'];
         $confirmar_password = $_POST['confirmar_password'];
-        
-        // Verificar que las contraseñas nuevas coincidan
+
         if ($nuevo_password !== $confirmar_password) {
             $mensaje = "<p style='color: red;'>Las contraseñas nuevas no coinciden</p>";
         } else {
-            // Verificar la contraseña actual
+            // Obtener contraseña actual desde la base de datos
             $stmt = $conn->prepare("SELECT password FROM usuarios WHERE usuario = :usuario");
             $stmt->bindParam(':usuario', $usuario);
             $stmt->execute();
             $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (password_verify($password_actual, $user_data['password'])) {
-                // Actualizar la contraseña
-                $password_hash = password_hash($nuevo_password, PASSWORD_DEFAULT);
+
+            $password_actual_hash = hash('sha256', $password_actual);
+
+            if ($user_data && hash_equals($user_data['password'], $password_actual_hash)) {
+                // Hashear la nueva contraseña con SHA-256
+                $nuevo_password_hash = hash('sha256', $nuevo_password);
+
                 $stmt = $conn->prepare("UPDATE usuarios SET password = :password WHERE usuario = :usuario");
-                $stmt->bindParam(':password', $password_hash);
+                $stmt->bindParam(':password', $nuevo_password_hash);
                 $stmt->bindParam(':usuario', $usuario);
-                
+
                 if ($stmt->execute()) {
                     $mensaje = "<p style='color: green;'>Contraseña actualizada correctamente</p>";
                 } else {
@@ -150,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <ul>
                 <li><a href="index.php">Inicio</a></li>
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
-                <li><a href="mi-cuenta.php" class="active">Mi Cuenta</a></li>
+                <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
             </ul>
         </nav>
     </header>

@@ -177,7 +177,7 @@ if ($view == 'mis_archivos') {
 
         .file-actions a {
             padding: 8px 8px;
-            background-color: #312450; /* Verde para el botón de descarga */
+            background-color: #312450; 
             color: white;
             border-radius: 10px;
             text-decoration: none;
