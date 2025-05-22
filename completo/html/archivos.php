@@ -34,10 +34,17 @@ if ($view == 'mis_archivos') {
     $stmt->execute([':id_usuario' => $id_usuario]);
     $archivos = $stmt->fetchAll();
 } elseif ($view == 'resumen') {
-    // Obtener datos desde MongoDB
-    $subidos = $mongoDB->subidos->find(['id_usuario' => $id_usuario])->toArray();
-    $eliminados = $mongoDB->eliminados->find(['usuario_id' => $id_usuario])->toArray();
-    $infectados = $mongoDB->infectados->find(['id_usuario' => $id_usuario])->toArray();
+    if ($_SESSION['is_admin'] == 1) {
+        // Admin ve todos los logs con [usuario]
+        $subidos = $mongoDB->subidos->find([])->toArray();
+        $eliminados = $mongoDB->eliminados->find([])->toArray();
+        $infectados = $mongoDB->infectados->find([])->toArray();
+    } else {
+        // Usuario normal solo ve sus propios logs
+        $subidos = $mongoDB->subidos->find(['id_usuario' => $id_usuario])->toArray();
+        $eliminados = $mongoDB->eliminados->find(['usuario_id' => $id_usuario])->toArray();
+        $infectados = $mongoDB->infectados->find(['id_usuario' => $id_usuario])->toArray();
+    }
     $archivos = []; // <-- Vacío o lo que se deba mostrar en resumen
 } else {
     // Si la vista no es válida, redirigir a 'mis_archivos'
@@ -245,9 +252,11 @@ if ($view == 'mis_archivos') {
                                 if (str_ends_with($realFileName, '.aes')) {
                                     $realFileName = substr($realFileName, 0, -4);
                                 }
+                                // NUEVO: Añade etiqueta [usuario] solo para admin
+                                $userTag = ($_SESSION['is_admin'] == 1) ? '['.$archivo['id_usuario'].'] ' : '';
                                 ?>
                                 <li>
-                                    <span><?php echo $realFileName; ?> (Subido)</span>
+                                    <span><?php echo $userTag . $realFileName; ?> (Subido)</span>
                                     <div class="file-actions">
                                         <a href="#"><i class="fas fa-file-upload"></i></a>
                                     </div>
@@ -261,9 +270,11 @@ if ($view == 'mis_archivos') {
                                 if (str_ends_with($realFileName, '.aes')) {
                                     $realFileName = substr($realFileName, 0, -4);
                                 }
+                                // NUEVO: Campo diferente para eliminados (usuario_id)
+                                $userTag = ($_SESSION['is_admin'] == 1) ? '['.$archivo['usuario_id'].'] ' : '';
                                 ?>
                                 <li>
-                                    <span><?php echo $realFileName; ?> (Eliminado)</span>
+                                    <span><?php echo $userTag . $realFileName; ?> (Eliminado)</span>
                                     <div class="file-actions">
                                         <i class="fas fa-trash-alt" style="color: red;"></i>
                                     </div>
@@ -277,9 +288,11 @@ if ($view == 'mis_archivos') {
                                 if (str_ends_with($realFileName, '.aes')) {
                                     $realFileName = substr($realFileName, 0, -4);
                                 }
+                                // NUEVO: Igual que subidos
+                                $userTag = ($_SESSION['is_admin'] == 1) ? '['.$archivo['id_usuario'].'] ' : '';
                                 ?>
                                 <li>
-                                    <span><?php echo $realFileName; ?> (Infectado)</span>
+                                    <span><?php echo $userTag . $realFileName; ?> (Infectado)</span>
                                     <div class="file-actions">
                                         <i class="fas fa-bug" style="color: darkred;"></i>
                                     </div>
