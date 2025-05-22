@@ -119,8 +119,9 @@ if ($view == 'mis_archivos') {
             padding: 15px 0;
             border-radius: 8px;
         }
-
+        
         .buttons-container a {
+            display: inline-block;
             font-size: 18px;
             color: #fff;
             text-decoration: none;
@@ -149,6 +150,7 @@ if ($view == 'mis_archivos') {
             border-top: 1px solid #ccc;
             background-color: rgb(255, 240, 245); /* Color de fondo diferente (rosa claro) */
             border-radius: 8px;
+            color: #000;
         }
 
         .file-list li {
