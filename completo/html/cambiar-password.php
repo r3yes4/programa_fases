@@ -150,6 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <nav>
             <ul>
                 <li><a href="index.php">Inicio</a></li>
+                <li><a href="archivos.php">Mis Archivos</a></li>
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
                 <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
             </ul>
@@ -162,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <nav>
                 <ul>
                     <li>
-                        <a href="mi-cuenta.php">Cuenta</a>
+                        <a href="mi_cuenta.php">Cuenta</a>
                     </li>
                     <li class="active">
                         <a href="cambiar-password.php">Cambiar la contraseña</a>
@@ -171,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <a href="logout.php">Cerrar sesión</a>
                     </li>
                     <li>
-                        <a href="borrar-cuenta.php">Borrar la cuenta</a>
+                        <a href="borrar_cuenta.php">Borrar la cuenta</a>
                     </li>
                 </ul>
             </nav>
