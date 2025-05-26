@@ -145,20 +145,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body class="is-preload">
-    <header id="header">
-        <a href="index.php" class="title">BLEET</a>
-        <nav>
-            <ul>
-                <li><a href="index.php">Inicio</a></li>
-                <li><a href="archivos.php">Mis Archivos</a></li>
-                <li><a href="subir-archivos.php">Subir archivo</a></li>
-                <li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
-            </ul>
-        </nav>
-    </header>
+        <header id="header">
+            <a href="index.php" class="title">BLEET</a>
+            <nav>
+                <ul>
+                    <li><a href="index.php">Inicio</a></li>
+                    <li><a href="archivos.php">Mis Archivos</a></li>
+                    <li><a href="subir-archivos.php">Subir archivo</a></li>
+                    <?php if ($_SESSION['is_admin'] == 1): ?>
+                        <li>
+                            <a href="control-panel.php">Panel de administración</a>
+                        </li>
+                    <?php endif; ?>
+                    <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
+                </ul>
+            </nav>
+        </header>
     <div class="container">
         <div class="sidebar">
-            <img src="assets/images/perfil.jpg" alt="Foto de perfil" class="profile-pic">
             <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
             <nav>
                 <ul>

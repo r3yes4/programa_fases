@@ -146,8 +146,8 @@ if (isset($_SESSION['usuario']) && !isset($_SESSION['username'])) {
 							<ul class="contact">
 								<li>
 									<h3>Dirección</h3>
-									<span>12345 Calle Ejemplo #654<br />
-									Ciudad, País 00000</span>
+									<span>Calle Jesus Lagos Solis #654<br />
+									Teruel, España</span>
 								</li>
 								<li>
 									<h3>Email</h3>
@@ -155,7 +155,7 @@ if (isset($_SESSION['usuario']) && !isset($_SESSION['username'])) {
 								</li>
 								<li>
 									<h3>Teléfono</h3>
-									<span>(123) 456-7890</span>
+									<span>(+34) 695745824</span>
 								</li>
 								<li>
 									<h3>Redes Sociales</h3>
