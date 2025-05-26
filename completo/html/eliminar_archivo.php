@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['archivo_id'])) {
         $stmt->execute([$archivo_id]);
 
         // Redirigir con mensaje de éxito
-        header("Location: index.php?msg=archivo_eliminado");
+        header("Location: archivos.php?msg=success");
         exit;
     } else {
         // Si no se encuentra el archivo
