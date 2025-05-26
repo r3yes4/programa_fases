@@ -115,7 +115,7 @@ DB_CONFIG = {
     "database": "bleet"
 }
 
-API_KEY = "890d64820c761129bf48777e0182b612a1acfb590b04045171faff730633d686"
+API_KEY = "ffc9cae15041fd15c4814ccca50268ab65934a6b0d6e4605998b9665c42fadf7"
 
 # Conectar a la base de datos y obtener archivos no analizados
 def obtener_archivos_pendientes():
