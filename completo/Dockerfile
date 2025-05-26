@@ -35,8 +35,12 @@ RUN pecl install mongodb && \
 # Configurar PHP para habilitar las extensiones necesarias
 RUN sed -i 's/;extension=pdo_mysql/extension=pdo_mysql/' /usr/local/etc/php/php.ini-production && \
     echo "extension=mongodb" >> /usr/local/etc/php/php.ini-production && \
+    echo "upload_max_filesize = 1024M" >> /usr/local/etc/php/php.ini-production && \
+    echo "post_max_size = 1050M" >> /usr/local/etc/php/php.ini-production && \
+    echo "memory_limit = 1024M" >> /usr/local/etc/php/php.ini-production && \
     cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
+RUN 
 # Asignar permisos adecuados a la carpeta de Apache
 RUN chown -R www-data:www-data /var/www/html
 
