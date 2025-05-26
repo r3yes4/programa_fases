@@ -145,14 +145,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
                 <?php if ($_SESSION['is_admin'] == 1): ?>
                     <li>
-                        <a href="control-panel.php">Control Panel</a>
+                        <a href="control-panel.php">Panel de administración</a>
                     </li>
                 <?php endif; ?>
                 <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
             </ul>
         </nav>
     </header>
-    <div class="container">
+    <div class="container" style="margin-bottom: 50px;">
         <div class="sidebar">
             <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
             <nav>
@@ -171,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </li>
                     <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
                     <li>
-                        <a href="control-panel.php">Control Panel</a>
+                        <a href="control-panel.php">Panel de administración</a>
                     </li>
                     <?php endif; ?>
                 </ul>
@@ -206,5 +206,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </div>
     <script src="assets/js/main.js"></script>
+    <footer id="footer" class="wrapper alt">
+        <div class="inner">
+            <ul class="menu">
+                <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+            </ul>
+        </div>
+    </footer>
 </body>
 </html>

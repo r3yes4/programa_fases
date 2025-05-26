@@ -58,16 +58,21 @@ if (!isset($_SESSION['usuario'])) {
 
 		<!-- Header -->
 		<header id="header">
-			<a href="index.php" class="title">BLEET</a>
-			<nav>
-				<ul>
-					<li><a href="index.php">Inicio</a></li>
-					<li><a href="archivos.php" class="active">Mis archivos</a></li>
-					<li><a href="subir-archivos.php" class="active">Subir archivo</a></li>
-					<li><a href="mi_cuenta.php">Mi cuenta</a></li>
-				</ul>
-			</nav>
-		</header>
+        <a href="index.php" class="title">BLEET</a>
+        <nav>
+            <ul>
+                <li><a href="index.php">Inicio</a></li>
+                <li><a href="archivos.php">Mis Archivos</a></li>
+                <li><a href="subir-archivos.php" class="active">Subir archivo</a></li>
+                <?php if ($_SESSION['is_admin'] == 1): ?>
+                    <li>
+                        <a href="control-panel.php">Panel de administración</a>
+                    </li>
+                <?php endif; ?>
+                <li><a href="mi_cuenta.php">Mi Cuenta</a></li>
+            </ul>
+        </nav>
+    	</header>
 
 		<!-- Wrapper -->
 		<div id="wrapper">
@@ -183,12 +188,12 @@ if (!isset($_SESSION['usuario'])) {
 
 		<!-- Footer -->
 		<footer id="footer" class="wrapper alt">
-			<div class="inner">
-				<ul class="menu">
-					<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-				</ul>
-			</div>
-		</footer>
+        <div class="inner">
+            <ul class="menu">
+                <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+            </ul>
+        </div>
+    	</footer>
 
 		<!-- Scripts -->
 		<script src="assets/js/jquery.min.js"></script>

@@ -216,9 +216,14 @@ if ($view == 'mis_archivos') {
         <nav>
             <ul>
                 <li><a href="index.php">Inicio</a></li>
-                <li><a href="archivos.php" class="active">Mis archivos</a></li>
-                <li><a href="subir-archivos.php" class="active">Subir archivo</a></li>
-                <li><a href="mi_cuenta.php">Mi cuenta</a></li>
+                <li><a href="archivos.php" class="active">Mis Archivos</a></li>
+                <li><a href="subir-archivos.php">Subir archivo</a></li>
+                <?php if ($_SESSION['is_admin'] == 1): ?>
+                    <li>
+                        <a href="control-panel.php">Panel de administración</a>
+                    </li>
+                <?php endif; ?>
+                <li><a href="mi_cuenta.php">Mi Cuenta</a></li>
             </ul>
         </nav>
     </header>

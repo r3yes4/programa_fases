@@ -58,16 +58,21 @@ $departamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		<!-- Header -->
 		<header id="header">
-			<a href="index.php" class="title">BLEET</a>
-			<nav>
-				<ul>
-					<li><a href="index.php">Inicio</a></li>
-					<li><a href="subir-archivos.php">Subir archivo</a></li>
-					<li><a href="control-panel.php" class="active">Panel de administración</a></li>
-					<li><a href="mi_cuenta.php">Mi cuenta</a></li>
-				</ul>
-			</nav>
-		</header>
+        <a href="index.php" class="title">BLEET</a>
+        <nav>
+            <ul>
+                <li><a href="index.php">Inicio</a></li>
+                <li><a href="archivos.php">Mis Archivos</a></li>
+                <li><a href="subir-archivos.php">Subir archivo</a></li>
+                <?php if ($_SESSION['is_admin'] == 1): ?>
+                    <li>
+                        <a href="control-panel.php" class="active">Panel de administración</a>
+                    </li>
+                <?php endif; ?>
+                <li><a href="mi_cuenta.php">Mi Cuenta</a></li>
+            </ul>
+        </nav>
+   		</header>
 
 		<!-- Wrapper -->
 		<div id="wrapper">
