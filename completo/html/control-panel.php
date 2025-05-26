@@ -69,7 +69,7 @@ $departamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <a href="control-panel.php" class="active">Panel de administración</a>
                     </li>
                 <?php endif; ?>
-                <li><a href="mi_cuenta.php">Mi Cuenta</a></li>
+                <li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
             </ul>
         </nav>
    		</header>

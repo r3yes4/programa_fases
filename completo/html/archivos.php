@@ -223,7 +223,7 @@ if ($view == 'mis_archivos') {
                         <a href="control-panel.php">Panel de administración</a>
                     </li>
                 <?php endif; ?>
-                <li><a href="mi_cuenta.php">Mi Cuenta</a></li>
+                <li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
             </ul>
         </nav>
     </header>
