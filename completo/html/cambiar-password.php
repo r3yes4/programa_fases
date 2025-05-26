@@ -152,12 +152,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <li><a href="index.php">Inicio</a></li>
                 <li><a href="archivos.php">Mis Archivos</a></li>
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
-                <li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
+                <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
             </ul>
         </nav>
     </header>
     <div class="container">
         <div class="sidebar">
+            <img src="assets/images/perfil.jpg" alt="Foto de perfil" class="profile-pic">
             <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
             <nav>
                 <ul>
