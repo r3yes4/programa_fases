@@ -242,6 +242,7 @@ while True:
                 # Mover el archivo limpio a la carpeta 'limpios'
                 shutil.move(ruta_archivo, nueva_ruta)
                 encrypt_file(nueva_ruta, f"{nueva_ruta}.aes", key)
+                os.remove(nueva_ruta)
                 print(f"Archivo limpio movido: {nueva_ruta}")
 
                 # Actualizar la ruta del archivo en la base de datos

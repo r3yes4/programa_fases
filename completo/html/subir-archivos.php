@@ -77,7 +77,7 @@ if (!isset($_SESSION['usuario'])) {
 			if (isset($_GET['message'])) {
 				$message = $_GET['message'];
 				if ($message == 'success') {
-					$mensaje = "Archivo subido con éxito.";
+					$mensaje = "Archivo subido con éxito, se le notificará cuando sea analizado y listo para su uso.";
 				} elseif ($message == 'virus') {
 					$mensaje = "El archivo contiene un virus y ha sido eliminado.";
 				} elseif ($message == 'error_script') {
