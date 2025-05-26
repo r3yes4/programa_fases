@@ -145,14 +145,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
                 <?php if ($_SESSION['is_admin'] == 1): ?>
                     <li>
+<<<<<<< HEAD
                         <a href="control-panel.php">Panel de administración</a>
+=======
+                        <a href="control-panel.php">Panel de Administración</a>
+>>>>>>> 141bac67aebdce67071a80fd3c39d99f2d4af7eb
                     </li>
                 <?php endif; ?>
-                <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
+                <li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
             </ul>
         </nav>
     </header>
+<<<<<<< HEAD
     <div class="container" style="margin-bottom: 50px;">
+=======
+    
+
+    <div class="container">
+>>>>>>> 141bac67aebdce67071a80fd3c39d99f2d4af7eb
         <div class="sidebar">
             <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
             <nav>
@@ -169,11 +179,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <li>
                         <a href="borrar_cuenta.php">Borrar la cuenta</a>
                     </li>
+<<<<<<< HEAD
                     <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
                     <li>
                         <a href="control-panel.php">Panel de administración</a>
                     </li>
                     <?php endif; ?>
+=======
+>>>>>>> 141bac67aebdce67071a80fd3c39d99f2d4af7eb
                 </ul>
             </nav>
         </div>

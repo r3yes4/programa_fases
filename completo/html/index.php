@@ -96,7 +96,7 @@ if (isset($_SESSION['usuario']) && !isset($_SESSION['username'])) {
 						<section>
 							<span class="icon solid major fa-cog"></span>
 							<h3>Configura a tus usuarios</h3>
-							<p>Phasellus convallis elit id ullam corper amet et pulvinar. Duis aliquam turpis mauris, sed ultricies erat dapibus.</p>
+							<p>Gestiona fácilmente los permisos y accesos de cada usuario. Define roles, controla quién puede subir o descargar archivos y mantén tu sistema seguro y organizado.</p>
 						</section>
 						<section>
 							<span class="icon solid major fa-desktop"></span>
@@ -146,8 +146,8 @@ if (isset($_SESSION['usuario']) && !isset($_SESSION['username'])) {
 							<ul class="contact">
 								<li>
 									<h3>Dirección</h3>
-									<span>12345 Calle Ejemplo #654<br />
-									Ciudad, País 00000</span>
+									<span>Calle Villanueva del Trabuco #654<br />
+									Pelic, España </span>
 								</li>
 								<li>
 									<h3>Email</h3>
@@ -155,7 +155,7 @@ if (isset($_SESSION['usuario']) && !isset($_SESSION['username'])) {
 								</li>
 								<li>
 									<h3>Teléfono</h3>
-									<span>(123) 456-7890</span>
+									<span>(34) 659 348 528</span>
 								</li>
 								<li>
 									<h3>Redes Sociales</h3>

@@ -58,6 +58,7 @@ $departamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		<!-- Header -->
 		<header id="header">
+<<<<<<< HEAD
         <a href="index.php" class="title">BLEET</a>
         <nav>
             <ul>
@@ -73,6 +74,18 @@ $departamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </ul>
         </nav>
    		</header>
+=======
+			<a href="index.php" class="title">BLEET</a>
+			<nav>
+				<ul>
+					<li><a href="index.php">Inicio</a></li>
+					<li><a href="subir-archivos.php">Subir archivo</a></li>
+					<li><a href="control-panel.php" class="active">Panel de administración</a></li>
+					<li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
+				</ul>
+			</nav>
+		</header>
+>>>>>>> 141bac67aebdce67071a80fd3c39d99f2d4af7eb
 
 		<!-- Wrapper -->
 		<div id="wrapper">

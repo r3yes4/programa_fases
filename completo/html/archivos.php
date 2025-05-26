@@ -216,6 +216,7 @@ if ($view == 'mis_archivos') {
         <nav>
             <ul>
                 <li><a href="index.php">Inicio</a></li>
+<<<<<<< HEAD
                 <li><a href="archivos.php" class="active">Mis Archivos</a></li>
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
                 <?php if ($_SESSION['is_admin'] == 1): ?>
@@ -224,6 +225,11 @@ if ($view == 'mis_archivos') {
                     </li>
                 <?php endif; ?>
                 <li><a href="mi_cuenta.php">Mi Cuenta</a></li>
+=======
+                <li><a href="archivos.php" class="active">Mis archivos</a></li>
+                <li><a href="subir-archivos.php" class="active">Subir archivo</a></li>
+                <li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
+>>>>>>> 141bac67aebdce67071a80fd3c39d99f2d4af7eb
             </ul>
         </nav>
     </header>
