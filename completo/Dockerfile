@@ -14,9 +14,9 @@ RUN apt-get update && \
       unzip && \
     # Instalar el conector de MySQL para Python
     pip install mysql-connector-python --break-system-packages && \
-    pip install pymongo && \
-    pip install hashlib && \
-    pip install pycryptodome && \
+    pip install pymongo --break-system-packages && \
+    pip install hashlib --break-system-packages && \
+    pip install pycryptodome --break-system-packages && \
     # Instalar dependencias para PHP
     docker-php-source extract && \
     apt-get install -y libonig-dev && \
@@ -35,9 +35,9 @@ RUN pecl install mongodb && \
 # Configurar PHP para habilitar las extensiones necesarias
 RUN sed -i 's/;extension=pdo_mysql/extension=pdo_mysql/' /usr/local/etc/php/php.ini-production && \
     echo "extension=mongodb" >> /usr/local/etc/php/php.ini-production && \
-    echo "upload_max_filesize = 1024M" >> /usr/local/etc/php/php.ini-production && \
-    echo "post_max_size = 1050M" >> /usr/local/etc/php/php.ini-production && \
-    echo "memory_limit = 1024M" >> /usr/local/etc/php/php.ini-production && \
+    echo "upload_max_filesize = 2048M" >> /usr/local/etc/php/php.ini-production && \
+    echo "post_max_size = 2100M" >> /usr/local/etc/php/php.ini-production && \
+    echo "memory_limit = 2048M" >> /usr/local/etc/php/php.ini-production && \
     cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 RUN 
