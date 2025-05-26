@@ -145,13 +145,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <li><a href="subir-archivos.php">Subir archivo</a></li>
                 <?php if ($_SESSION['is_admin'] == 1): ?>
                     <li>
-                        <a href="control-panel.php">Control Panel</a>
+                        <a href="control-panel.php">Panel de Administración</a>
                     </li>
                 <?php endif; ?>
-                <li><a href="mi_cuenta.php" class="active">Mi Cuenta</a></li>
+                <li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
             </ul>
         </nav>
     </header>
+    
+
     <div class="container">
         <div class="sidebar">
             <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
@@ -169,11 +171,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <li>
                         <a href="borrar_cuenta.php">Borrar la cuenta</a>
                     </li>
-                    <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
-                    <li>
-                        <a href="control-panel.php">Control Panel</a>
-                    </li>
-                    <?php endif; ?>
                 </ul>
             </nav>
         </div>

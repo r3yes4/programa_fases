@@ -64,7 +64,7 @@ if (!isset($_SESSION['usuario'])) {
 					<li><a href="index.php">Inicio</a></li>
 					<li><a href="archivos.php" class="active">Mis archivos</a></li>
 					<li><a href="subir-archivos.php" class="active">Subir archivo</a></li>
-					<li><a href="mi_cuenta.php">Mi cuenta</a></li>
+					<li><a href="mi_cuenta.php"><?php echo htmlspecialchars($_SESSION['usuario']); ?></a></li>
 				</ul>
 			</nav>
 		</header>
