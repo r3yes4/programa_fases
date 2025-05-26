@@ -15,7 +15,6 @@ RUN apt-get update && \
     # Instalar el conector de MySQL para Python
     pip install mysql-connector-python --break-system-packages && \
     pip install pymongo --break-system-packages && \
-    pip install hashlib --break-system-packages && \
     pip install pycryptodome --break-system-packages && \
     # Instalar dependencias para PHP
     docker-php-source extract && \

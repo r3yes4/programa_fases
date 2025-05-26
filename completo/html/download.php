@@ -9,11 +9,6 @@ if (!isset($_SESSION['usuario'])) {
     die("Acceso denegado.");
 }
 
-if ($_SERVER['HTTP_REFERER'] !== 'http://*/download') {
-    http_response_code(403);
-    die("Acceso denegado.");
-}
-
 $usuario = $_SESSION['usuario'];
 $password = "hola123456789hola";
 $key = substr(hash("sha512", $password, true), 0, 32);
